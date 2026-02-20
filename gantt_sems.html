@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Programas Institucionales — CBTis 179</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2EFE9; --surface:#FDFCFA; --border:#DDD8CE;
+  --text:#1C1A17; --muted:#8A8278; --accent:#6C3461;
+  --fomalasa:#C0392B; --dhdgb:#1A5276; --amadgeti:#1E8449; --pronafole:#784212;
+  --we:#E9E6E0; --alt:#F7F4EF;
+  --row-h:44px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── HEADER ── */
+header{
+  background:var(--accent);
+  padding:18px 28px;
+  display:flex;align-items:center;gap:16px;
+}
+.hico{font-size:26px;}
+.htx h1{font-family:'DM Serif Display',serif;font-size:20px;color:#fff;line-height:1.2;}
+.htx p{font-size:11px;color:rgba(255,255,255,.55);margin-top:3px;}
+.hbadge{margin-left:auto;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+  border-radius:8px;padding:7px 16px;text-align:center;flex-shrink:0;}
+.hbadge b{display:block;font-size:14px;color:#fff;}
+.hbadge span{font-size:10px;color:rgba(255,255,255,.55);}
+
+/* ── TOOLBAR ── */
+.toolbar{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:10px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.tlbl{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;}
+.tbtn{
+  border:1px solid var(--border);background:var(--surface);
+  border-radius:20px;padding:5px 14px;font-size:11px;
+  font-family:inherit;cursor:pointer;color:var(--text);
+  transition:all .15s;font-weight:600;
+}
+.tbtn:hover{border-color:var(--accent);color:var(--accent);}
+.tbtn.on{color:#fff;}
+.tbtn.on[data-prog="FOMALASA"] {background:var(--fomalasa);border-color:var(--fomalasa);}
+.tbtn.on[data-prog="DH-DGB"]   {background:var(--dhdgb);border-color:var(--dhdgb);}
+.tbtn.on[data-prog="AMA-DGETI"]{background:var(--amadgeti);border-color:var(--amadgeti);}
+.tbtn.on[data-prog="PRONAFOLE"]{background:var(--pronafole);border-color:var(--pronafole);}
+.tsep{width:1px;height:24px;background:var(--border);}
+.tsel{
+  border:1px solid var(--border);background:var(--surface);border-radius:20px;
+  padding:5px 28px 5px 14px;font-size:11px;font-family:inherit;
+  color:var(--text);cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238A8278'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;
+}
+
+/* ── STATS ── */
+.stats{display:flex;background:var(--surface);border-bottom:1px solid var(--border);}
+.stat{flex:1;padding:10px 18px;border-right:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.stat:last-child{border-right:none;}
+.sdot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.sn{font-size:18px;font-weight:700;font-family:'DM Serif Display',serif;line-height:1;}
+.sl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+
+/* ── GANTT LAYOUT ── */
+.gantt-wrap{display:flex;overflow:hidden;}
+
+/* Left frozen panel */
+.g-left{
+  flex-shrink:0;
+  width:680px;
+  border-right:2px solid var(--accent);
+  overflow:hidden;
+  position:relative;
+  z-index:5;
+  background:var(--surface);
+}
+
+/* Right scrollable gantt */
+.g-right{flex:1;overflow-x:auto;overflow-y:hidden;}
+
+/* Both sides scroll together vertically */
+.g-left-inner{overflow:hidden;}
+.g-right-inner{overflow-x:auto;}
+
+/* ── LEFT HEADER ── */
+.lh{
+  display:grid;
+  grid-template-columns:110px 1fr 150px 200px;
+  background:var(--accent);
+  position:sticky;top:0;z-index:10;
+  border-bottom:1px solid rgba(255,255,255,.15);
+}
+.lh-cell{
+  padding:10px 12px;
+  font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  color:rgba(255,255,255,.75);
+  border-right:1px solid rgba(255,255,255,.12);
+}
+.lh-cell:last-child{border-right:none;}
+
+/* ── LEFT ROWS ── */
+.l-prog-hdr{
+  display:grid;
+  grid-template-columns:110px 1fr 150px 200px;
+  align-items:center;
+  border-bottom:1px solid rgba(255,255,255,.15);
+  cursor:pointer;
+}
+.l-prog-hdr:hover{filter:brightness(1.08);}
+.l-prog-label{
+  grid-column:1/-1;
+  padding:10px 14px;
+  font-size:12px;font-weight:700;color:#fff;letter-spacing:.04em;
+  display:flex;align-items:center;gap:10px;
+}
+.l-prog-label .chevron{
+  margin-left:auto;font-size:14px;
+  transition:transform .25s;
+}
+.l-prog-label .chevron.open{transform:rotate(90deg);}
+
+.l-row{
+  display:grid;
+  grid-template-columns:110px 1fr 150px 200px;
+  border-bottom:1px solid var(--border);
+  align-items:stretch;
+  min-height:var(--row-h);
+  transition:background .1s;
+}
+.l-row:hover{filter:brightness(.97);}
+.l-row.hidden{display:none;}
+
+.l-cell{
+  padding:6px 10px;
+  font-size:11px;
+  border-right:1px solid var(--border);
+  display:flex;align-items:center;
+  line-height:1.3;
+}
+.l-cell:last-child{border-right:none;}
+.lc-prog{
+  font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+  border-right-width:3px!important;
+}
+.lc-act{cursor:pointer;font-weight:500;}
+.lc-act:hover{text-decoration:underline;}
+.lc-resp input{
+  width:100%;border:none;background:transparent;
+  font-family:inherit;font-size:10px;color:var(--text);
+  outline:none;padding:2px 0;
+}
+.lc-resp input:focus{
+  background:rgba(108,52,97,.07);border-radius:4px;
+  outline:1px solid var(--accent);padding:2px 4px;
+}
+.lc-amb select{
+  width:100%;border:none;background:transparent;
+  font-family:inherit;font-size:10px;color:var(--text);
+  outline:none;cursor:pointer;
+}
+.lc-amb select:focus{
+  background:rgba(108,52,97,.07);border-radius:4px;outline:1px solid var(--accent);
+}
+
+/* ── RIGHT: GANTT GRID ── */
+.rh-months{
+  display:flex;
+  background:#2C3E50;
+  position:sticky;top:0;z-index:10;
+}
+.rh-month{
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:rgba(255,255,255,.9);
+  letter-spacing:.08em;
+  cursor:pointer;
+  transition:background .15s;
+  border-right:1px solid rgba(255,255,255,.1);
+  user-select:none;
+  position:relative;
+  overflow:hidden;
+}
+.rh-month:hover{background:rgba(255,255,255,.1);}
+.rh-month.collapsed{
+  background:rgba(255,255,255,.05);
+  color:rgba(255,255,255,.5);
+}
+.rh-month .m-arrow{
+  margin-left:6px;font-size:10px;opacity:.7;
+  transition:transform .25s;
+}
+.rh-month.collapsed .m-arrow{transform:rotate(-90deg);}
+
+.rh-days{
+  display:flex;
+  background:var(--accent);
+  position:sticky;top:28px;z-index:10;
+}
+.rh-day{
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;font-weight:600;color:rgba(255,255,255,.65);
+  border-right:1px solid rgba(255,255,255,.07);
+  padding:5px 0;
+}
+.rh-day.we{background:rgba(0,0,0,.2);}
+
+/* Gantt body rows */
+.r-prog-hdr{
+  display:flex;
+  border-bottom:1px solid rgba(255,255,255,.15);
+  min-height:38px;align-items:stretch;
+}
+.r-row{
+  display:flex;
+  border-bottom:1px solid var(--border);
+  min-height:var(--row-h);
+  align-items:stretch;
+}
+.r-row.hidden{display:none;}
+
+.r-day{
+  flex-shrink:0;
+  border-right:1px solid rgba(220,215,205,.35);
+  position:relative;
+  cursor:pointer;
+  transition:background .08s;
+}
+.r-day.we{background:var(--we);}
+.r-day:hover{background:rgba(108,52,97,.15)!important;}
+.r-day.col-hidden{display:none;}
+
+/* Bar */
+.bar{
+  position:absolute;top:8px;bottom:8px;
+  left:0;right:0;
+  pointer-events:none;
+  border-radius:0;
+  opacity:.88;
+}
+.bar.bs{left:3px;border-radius:4px 0 0 4px;}
+.bar.be{right:3px;border-radius:0 4px 4px 0;}
+.bar.bo{left:3px;right:3px;border-radius:4px;}
+
+/* Collapsed month shows summary bar */
+.r-month-collapsed{
+  flex-shrink:0;
+  border-right:1px solid rgba(220,215,205,.35);
+  position:relative;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8px;font-weight:700;letter-spacing:.05em;
+  color:var(--muted);
+}
+.r-month-collapsed.has-activity{background:rgba(108,52,97,.06);}
+.r-month-collapsed .mini-bar{
+  position:absolute;bottom:4px;left:4px;right:4px;
+  height:4px;border-radius:2px;opacity:.6;
+}
+
+/* ── DATE POPUP ── */
+.dpop{
+  position:fixed;background:var(--surface);
+  border:1px solid var(--border);border-radius:12px;
+  box-shadow:0 10px 32px rgba(0,0,0,.16);
+  padding:18px 20px;z-index:1000;width:260px;display:none;
+}
+.dpop.open{display:block;animation:popIn .18s ease;}
+@keyframes popIn{from{opacity:0;transform:scale(.94)translateY(-4px)}to{opacity:1;transform:none}}
+.dpop h4{font-size:12px;font-weight:700;margin-bottom:14px;color:var(--accent);
+  font-family:'DM Serif Display',serif;line-height:1.35;padding-right:22px;}
+.drow{display:flex;gap:8px;margin-bottom:9px;align-items:center;}
+.drow label{font-size:10px;color:var(--muted);width:72px;flex-shrink:0;}
+.dpop select,.dpop input[type=number]{
+  flex:1;border:1px solid var(--border);border-radius:5px;
+  padding:6px 8px;font-family:inherit;font-size:11px;
+  background:var(--bg);outline:none;color:var(--text);
+}
+.dpop select:focus,.dpop input:focus{border-color:var(--accent);}
+.dpop-btns{display:flex;gap:8px;margin-top:14px;}
+.dpop-btn{flex:1;padding:8px;border-radius:7px;border:none;font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;}
+.dpop-save{background:var(--accent);color:#fff;}
+.dpop-cancel{background:var(--border);color:var(--text);}
+.dpop-x{position:absolute;top:10px;right:12px;background:none;border:none;cursor:pointer;font-size:15px;color:var(--muted);}
+
+/* ── DETAIL PANEL ── */
+.dpanel{
+  position:fixed;right:-370px;top:0;bottom:0;width:355px;
+  background:var(--surface);border-left:1px solid var(--border);
+  z-index:600;transition:right .3s cubic-bezier(.4,0,.2,1);
+  padding:24px 20px;overflow-y:auto;
+  box-shadow:-4px 0 24px rgba(0,0,0,.1);
+}
+.dpanel.open{right:0;}
+.dpanel-x{position:absolute;top:14px;right:14px;background:none;border:none;cursor:pointer;font-size:17px;color:var(--muted);}
+.dp-badge{display:inline-block;padding:3px 10px;border-radius:4px;font-size:10px;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;color:#fff;margin-bottom:10px;}
+.dp-ttl{font-family:'DM Serif Display',serif;font-size:18px;line-height:1.3;margin-bottom:14px;}
+.dpf{margin-bottom:11px;}
+.dpf label{display:block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px;}
+.dpf input,.dpf select,.dpf textarea{
+  width:100%;border:1px solid var(--border);border-radius:7px;
+  padding:8px 10px;font-family:inherit;font-size:12px;
+  color:var(--text);background:var(--bg);outline:none;
+}
+.dpf input:focus,.dpf select:focus,.dpf textarea:focus{border-color:var(--accent);}
+.dpf textarea{resize:vertical;min-height:68px;}
+.dp-hr{border:none;border-top:1px solid var(--border);margin:13px 0;}
+.dp-save{
+  width:100%;padding:10px;background:var(--accent);color:#fff;
+  border:none;border-radius:8px;font-family:inherit;font-size:13px;
+  font-weight:600;cursor:pointer;margin-top:6px;transition:opacity .15s;
+}
+.dp-save:hover{opacity:.86;}
+.dp-datehint{
+  background:var(--alt);border:1px solid var(--border);
+  border-radius:7px;padding:8px 12px;font-size:11px;
+  color:var(--muted);margin-bottom:12px;
+}
+.dp-datehint strong{color:var(--text);}
+
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="hico">📅</span>
+  <div class="htx">
+    <h1>Cronograma de Programas Institucionales</h1>
+    <p>CBTis 179 · DGETI · SEMS &nbsp;|&nbsp; Clic en los meses para expandir/colapsar · Clic en días para editar fechas</p>
+  </div>
+  <div class="hbadge"><b>Feb – Jun 2026</b><span>2do Semestre</span></div>
+</header>
+
+<div class="toolbar">
+  <span class="tlbl">Programa</span>
+  <button class="tbtn on" data-prog="FOMALASA"  onclick="toggleProg(this)">🏥 FOMALASA</button>
+  <button class="tbtn on" data-prog="DH-DGB"    onclick="toggleProg(this)">⚖️ DH-DGB</button>
+  <button class="tbtn on" data-prog="AMA-DGETI" onclick="toggleProg(this)">🌱 AMA-DGETI</button>
+  <button class="tbtn on" data-prog="PRONAFOLE" onclick="toggleProg(this)">📚 PRONAFOLE</button>
+  <div class="tsep"></div>
+  <span class="tlbl">Ámbito</span>
+  <select class="tsel" onchange="filterAmbito(this.value)">
+    <option value="">Todos</option>
+    <option>Práctica y Colaboración Ciudadana</option>
+    <option>Educación para la Salud</option>
+    <option>Actividades Físicas y Deportivas</option>
+    <option>Educación Integral en Sexualidad y Género</option>
+    <option>Actividades Artísticas y Culturales</option>
+  </select>
+  <div class="tsep"></div>
+  <button class="tbtn" onclick="expandAll()">⊞ Expandir todo</button>
+  <button class="tbtn" onclick="collapseAll()">⊟ Colapsar todo</button>
+  <div class="tsep"></div>
+  <button class="tbtn" onclick="window.print()">🖨 Imprimir</button>
+  <button class="tbtn" onclick="exportData()">⬇ Exportar</button>
+</div>
+
+<div class="stats" id="statsBar"></div>
+
+<div class="gantt-wrap" id="ganttWrap">
+  <!-- Left panel -->
+  <div class="g-left" id="gLeft">
+    <div class="lh">
+      <div class="lh-cell">Programa</div>
+      <div class="lh-cell">Actividad</div>
+      <div class="lh-cell">Responsable</div>
+      <div class="lh-cell">Ámbito FSE</div>
+    </div>
+    <div id="leftBody"></div>
+  </div>
+  <!-- Right panel -->
+  <div class="g-right" id="gRight">
+    <div class="rh-months" id="rhMonths"></div>
+    <div class="rh-days"   id="rhDays"></div>
+    <div id="rightBody"></div>
+  </div>
+</div>
+
+
+<!-- Detail panel -->
+<div class="dpanel" id="dpanel">
+  <button class="dpanel-x" onclick="closeDetail()">✕</button>
+  <div id="dpanelContent"></div>
+</div>
+
+<script>
+// ── CONSTANTS ────────────────────────────────────────────────
+const MESES=[
+  {nombre:"FEB",label:"Febrero",dias:28},
+  {nombre:"MAR",label:"Marzo",  dias:31},
+  {nombre:"ABR",label:"Abril",  dias:30},
+  {nombre:"MAY",label:"Mayo",   dias:31},
+  {nombre:"JUN",label:"Junio",  dias:30},
+];
+const DIAS_ACUM={};
+let _a=0; MESES.forEach(m=>{DIAS_ACUM[m.nombre]=_a;_a+=m.dias;});
+const TOTAL_DIAS=_a;
+
+function dayAbs(mes,dia){if(!mes||!dia) return 0; return DIAS_ACUM[mes]+dia;}
+
+// Build a Set of active absolute days from activeDays array or mesIni/dIni/mesFin/dFin range
+function buildDaysSet(itm){
+  const s=new Set();
+  // Restore from individually saved days if available
+  if(itm.activeDays && itm.activeDays.length){
+    itm.activeDays.forEach(d=>s.add(d));
+    return s;
+  }
+  if(!itm.mesIni||!itm.dIni) return s;
+  const ini=DIAS_ACUM[itm.mesIni]+itm.dIni;
+  const fin=DIAS_ACUM[itm.mesFin]+itm.dFin;
+  for(let d=ini;d<=fin;d++) s.add(d);
+  return s;
+}
+
+// Sync mesIni/dIni/mesFin/dFin back from a days Set (for save/load compat)
+function syncRangeFromDays(itm){
+  if(!itm.days||itm.days.size===0){
+    itm.mesIni=''; itm.dIni=0; itm.mesFin=''; itm.dFin=0;
+    return;
+  }
+  const sorted=[...itm.days].sort((a,b)=>a-b);
+  const minD=sorted[0], maxD=sorted[sorted.length-1];
+  itm.mesIni=absToMes(minD); itm.dIni=minD-DIAS_ACUM[itm.mesIni];
+  itm.mesFin=absToMes(maxD); itm.dFin=maxD-DIAS_ACUM[itm.mesFin];
+  // Store individual days for persistence
+  itm.activeDays=[...itm.days];
+}
+function isWeekend(d){const dt=new Date(2026,0,31);dt.setDate(dt.getDate()+d);return dt.getDay()===0||dt.getDay()===6;}
+function mesOfDay(dAbs){
+  let r=dAbs;
+  for(const m of MESES){if(r<=m.dias)return m.nombre;r-=m.dias;}
+  return "JUN";
+}
+
+const PC={
+  "FOMALASA": {color:"#C0392B",light:"#FBEAE9",icon:"🏥"},
+  "DH-DGB":   {color:"#1A5276",light:"#E8F1F8",icon:"⚖️"},
+  "AMA-DGETI":{color:"#1E8449",light:"#E9F7EF",icon:"🌱"},
+  "PRONAFOLE":{color:"#784212",light:"#FDF0E4",icon:"📚"},
+};
+const AMBITOS=["Práctica y Colaboración Ciudadana","Educación para la Salud","Actividades Físicas y Deportivas","Educación Integral en Sexualidad y Género","Actividades Artísticas y Culturales"];
+const PROPS={
+  "Práctica y Colaboración Ciudadana":["1. Derechos humanos y jóvenes","2. Inseguridad, violencia y cultura de paz","3. Perspectiva de género y violencia de género","4. Hábitos de consumo y cambio climático","5. Diálogo, escucha activa y trabajo colaborativo"],
+  "Educación para la Salud":["1. Autocuidado y bienestar integral","2. Alimentación consciente y ética","3. Hábitos, adicciones y toma de decisiones","4. Relaciones interpersonales y resolución de conflictos"],
+  "Actividades Físicas y Deportivas":["1. Juego y actividad física como derecho","2. Deporte, salud y convivencia respetuosa","3. Emociones y decisiones en la práctica deportiva","4. Discriminación e inclusión en el deporte","5. Igualdad de oportunidades en el deporte"],
+  "Educación Integral en Sexualidad y Género":["1. Identidad, orientación sexual y vínculos afectivos","2. Dimensiones de la sexualidad y derechos sexuales","3. Roles de género y vida sexual y reproductiva","4. Autonomía, placer y normas sociales","5. Ciudadanía sexual y proyecto de vida"],
+  "Actividades Artísticas y Culturales":["1. Expresiones artísticas y experiencias colectivas","2. Arte como expresión política y comunitaria","3. Arte y contexto histórico-social","4. Arte para el autodescubrimiento e identidad"],
+};
+
+let DATA=[
+  {id:1, prog:"FOMALASA", act:"Día Mundial Lucha contra la Depresión",resp:"",ambito:"Educación para la Salud",prop:"3. Hábitos, adicciones y toma de decisiones",mesIni:"FEB",dIni:16,mesFin:"FEB",dFin:20,obs:""},
+  {id:2, prog:"FOMALASA", act:"Menstruación Digna / Martes de Menstruación",resp:"",ambito:"Educación para la Salud",prop:"1. Autocuidado y bienestar integral",mesIni:"FEB",dIni:1,mesFin:"JUN",dFin:30,obs:""},
+  {id:3, prog:"FOMALASA", act:"Día Mundial del Condón",resp:"",ambito:"Educación Integral en Sexualidad y Género",prop:"2. Dimensiones de la sexualidad y derechos sexuales",mesIni:"FEB",dIni:13,mesFin:"FEB",dFin:13,obs:""},
+  {id:4, prog:"FOMALASA", act:"Día Mundial de la Obesidad - Prevención",resp:"",ambito:"Educación para la Salud",prop:"2. Alimentación consciente y ética",mesIni:"MAR",dIni:4,mesFin:"MAR",dFin:4,obs:""},
+  {id:5, prog:"FOMALASA", act:"JNPA 2ª etapa - Prevención de Adicciones",resp:"",ambito:"Educación para la Salud",prop:"3. Hábitos, adicciones y toma de decisiones",mesIni:"ABR",dIni:13,mesFin:"ABR",dFin:30,obs:""},
+  {id:6, prog:"FOMALASA", act:"Día Lucha Homofobia, Transfobia y Bifobia",resp:"",ambito:"Educación Integral en Sexualidad y Género",prop:"4. Autonomía, placer y normas sociales",mesIni:"ABR",dIni:17,mesFin:"ABR",dFin:17,obs:""},
+  {id:7, prog:"FOMALASA", act:"Día Internacional contra el Acoso Escolar",resp:"",ambito:"Práctica y Colaboración Ciudadana",prop:"2. Inseguridad, violencia y cultura de paz",mesIni:"MAY",dIni:6,mesFin:"MAY",dFin:6,obs:""},
+  {id:8, prog:"FOMALASA", act:"Día Lucha Homofobia / Transfobia (Mayo)",resp:"",ambito:"Educación Integral en Sexualidad y Género",prop:"4. Autonomía, placer y normas sociales",mesIni:"MAY",dIni:17,mesFin:"MAY",dFin:17,obs:""},
+  {id:9, prog:"FOMALASA", act:"Día Mundial sin Tabaco",resp:"",ambito:"Educación para la Salud",prop:"3. Hábitos, adicciones y toma de decisiones",mesIni:"MAY",dIni:29,mesFin:"MAY",dFin:29,obs:""},
+  {id:10,prog:"DH-DGB",   act:"Día Intl Mujer y Niña en la Ciencia",resp:"",ambito:"Práctica y Colaboración Ciudadana",prop:"3. Perspectiva de género y violencia de género",mesIni:"FEB",dIni:11,mesFin:"FEB",dFin:11,obs:""},
+  {id:11,prog:"DH-DGB",   act:"Día Internacional de la Mujer",resp:"",ambito:"Práctica y Colaboración Ciudadana",prop:"3. Perspectiva de género y violencia de género",mesIni:"MAR",dIni:8,mesFin:"MAR",dFin:8,obs:""},
+  {id:12,prog:"DH-DGB",   act:"Día Intl Deporte para el Desarrollo y Paz",resp:"",ambito:"Actividades Físicas y Deportivas",prop:"2. Deporte, salud y convivencia respetuosa",mesIni:"ABR",dIni:6,mesFin:"ABR",dFin:6,obs:""},
+  {id:13,prog:"DH-DGB",   act:"Día Internacional Diversidad Cultural",resp:"",ambito:"Práctica y Colaboración Ciudadana",prop:"1. Derechos humanos y jóvenes",mesIni:"MAY",dIni:21,mesFin:"MAY",dFin:21,obs:""},
+  {id:14,prog:"DH-DGB",   act:"Semana Derechos Diversidades Sexuales",resp:"",ambito:"Educación Integral en Sexualidad y Género",prop:"5. Ciudadanía sexual y proyecto de vida",mesIni:"JUN",dIni:22,mesFin:"JUN",dFin:28,obs:""},
+  {id:15,prog:"AMA-DGETI",act:"Día Mundial de la Energía",resp:"",ambito:"Práctica y Colaboración Ciudadana",prop:"4. Hábitos de consumo y cambio climático",mesIni:"FEB",dIni:15,mesFin:"FEB",dFin:15,obs:""},
+  {id:16,prog:"AMA-DGETI",act:"Día de la Educación Ambiental",resp:"",ambito:"Práctica y Colaboración Ciudadana",prop:"4. Hábitos de consumo y cambio climático",mesIni:"FEB",dIni:26,mesFin:"FEB",dFin:26,obs:""},
+  {id:17,prog:"AMA-DGETI",act:"Día Mundial Ingeniería Desarrollo Sostenible",resp:"",ambito:"Práctica y Colaboración Ciudadana",prop:"4. Hábitos de consumo y cambio climático",mesIni:"MAR",dIni:4,mesFin:"MAR",dFin:4,obs:""},
+  {id:18,prog:"AMA-DGETI",act:"Día Mundial del Clima",resp:"",ambito:"Práctica y Colaboración Ciudadana",prop:"4. Hábitos de consumo y cambio climático",mesIni:"MAR",dIni:26,mesFin:"MAR",dFin:26,obs:""},
+  {id:19,prog:"PRONAFOLE",act:"1) Periódico Mural",resp:"",ambito:"Actividades Artísticas y Culturales",prop:"1. Expresiones artísticas y experiencias colectivas",mesIni:"FEB",dIni:3,mesFin:"JUN",dFin:26,obs:"Todo el semestre"},
+  {id:20,prog:"PRONAFOLE",act:"2) Actividades de Fomento a la Lectura",resp:"",ambito:"Actividades Artísticas y Culturales",prop:"2. Arte como expresión política y comunitaria",mesIni:"FEB",dIni:3,mesFin:"JUN",dFin:26,obs:"Todo el semestre"},
+  {id:21,prog:"PRONAFOLE",act:"3) Leamos la ciencia para todos",resp:"",ambito:"Actividades Artísticas y Culturales",prop:"3. Arte y contexto histórico-social",mesIni:"FEB",dIni:3,mesFin:"JUN",dFin:26,obs:"Todo el semestre"},
+  {id:22,prog:"PRONAFOLE",act:"4) Convocatoria Cuento y Poesía Indígena",resp:"",ambito:"Actividades Artísticas y Culturales",prop:"2. Arte como expresión política y comunitaria",mesIni:"MAR",dIni:2,mesFin:"MAR",dFin:6,obs:""},
+  {id:23,prog:"PRONAFOLE",act:"5a) Recepción Cuento/Poesía - Local",resp:"",ambito:"Actividades Artísticas y Culturales",prop:"1. Expresiones artísticas y experiencias colectivas",mesIni:"MAR",dIni:23,mesFin:"MAR",dFin:27,obs:""},
+  {id:24,prog:"PRONAFOLE",act:"5b) Recepción Cuento/Poesía - Estatal",resp:"",ambito:"Actividades Artísticas y Culturales",prop:"1. Expresiones artísticas y experiencias colectivas",mesIni:"ABR",dIni:20,mesFin:"ABR",dFin:24,obs:""},
+  {id:25,prog:"PRONAFOLE",act:"5c) Recepción Cuento/Poesía - Nacional",resp:"",ambito:"Actividades Artísticas y Culturales",prop:"1. Expresiones artísticas y experiencias colectivas",mesIni:"MAY",dIni:11,mesFin:"MAY",dFin:15,obs:""},
+  {id:26,prog:"PRONAFOLE",act:"6) Publicación ganadores Cuento/Poesía",resp:"",ambito:"Actividades Artísticas y Culturales",prop:"2. Arte como expresión política y comunitaria",mesIni:"FEB",dIni:3,mesFin:"JUN",dFin:26,obs:"Sin fecha establecida"},
+  {id:27,prog:"PRONAFOLE",act:"7) Webinar Taller de Escritura",resp:"",ambito:"Actividades Artísticas y Culturales",prop:"3. Arte y contexto histórico-social",mesIni:"MAY",dIni:25,mesFin:"MAY",dFin:29,obs:""},
+  {id:28,prog:"PRONAFOLE",act:"8a) Reporte mensual Febrero",resp:"",ambito:"Práctica y Colaboración Ciudadana",prop:"5. Diálogo, escucha activa y trabajo colaborativo",mesIni:"FEB",dIni:23,mesFin:"FEB",dFin:27,obs:""},
+  {id:29,prog:"PRONAFOLE",act:"8b) Reporte mensual Marzo",resp:"",ambito:"Práctica y Colaboración Ciudadana",prop:"5. Diálogo, escucha activa y trabajo colaborativo",mesIni:"MAR",dIni:23,mesFin:"MAR",dFin:27,obs:""},
+  {id:30,prog:"PRONAFOLE",act:"8c) Reporte mensual Abril",resp:"",ambito:"Práctica y Colaboración Ciudadana",prop:"5. Diálogo, escucha activa y trabajo colaborativo",mesIni:"ABR",dIni:27,mesFin:"ABR",dFin:30,obs:""},
+  {id:31,prog:"PRONAFOLE",act:"8d) Reporte mensual Mayo",resp:"",ambito:"Práctica y Colaboración Ciudadana",prop:"5. Diálogo, escucha activa y trabajo colaborativo",mesIni:"MAY",dIni:25,mesFin:"MAY",dFin:29,obs:""},
+  {id:32,prog:"PRONAFOLE",act:"8e) Reporte mensual Junio",resp:"",ambito:"Práctica y Colaboración Ciudadana",prop:"5. Diálogo, escucha activa y trabajo colaborativo",mesIni:"JUN",dIni:22,mesFin:"JUN",dFin:26,obs:""},
+  {id:33,prog:"PRONAFOLE",act:"9a) Estatus Clubes de Lectura - Marzo",resp:"",ambito:"Actividades Artísticas y Culturales",prop:"1. Expresiones artísticas y experiencias colectivas",mesIni:"MAR",dIni:23,mesFin:"MAR",dFin:27,obs:""},
+  {id:34,prog:"PRONAFOLE",act:"9b) Estatus Clubes de Lectura - Mayo",resp:"",ambito:"Actividades Artísticas y Culturales",prop:"1. Expresiones artísticas y experiencias colectivas",mesIni:"MAY",dIni:25,mesFin:"MAY",dFin:29,obs:""},
+];
+
+try{const s=localStorage.getItem('gsems3');if(s)DATA=JSON.parse(s);}catch(e){}
+function save(){try{localStorage.setItem('gsems3',JSON.stringify(DATA));}catch(e){}}
+
+// State
+let activeProgs=new Set(["FOMALASA","DH-DGB","AMA-DGETI","PRONAFOLE"]);
+let activeAmbito="";
+// Which months are expanded (all start expanded)
+let expandedMonths=new Set(MESES.map(m=>m.nombre));
+let collapsedProgs=new Set();
+let openId=null;
+
+function absToMes(abs){
+  let r=abs;
+  for(const m of MESES){ if(r<=m.dias) return m.nombre; r-=m.dias; }
+  return MESES[MESES.length-1].nombre;
+}
+
+const DAY_W=22; // px per day when expanded
+const MONTH_COLLAPSED_W=38; // px when collapsed
+
+// ── SYNC SCROLL ───────────────────────────────────────────────
+// Sync vertical scroll between left and right
+function syncScroll(){
+  const left=document.getElementById('leftBody');
+  const right=document.getElementById('rightBody');
+  if(!left||!right) return;
+  right.addEventListener('scroll',()=>{ left.scrollTop=right.scrollTop; });
+  left.addEventListener('scroll',()=>{ right.scrollTop=left.scrollTop; });
+}
+
+// ── BUILD ─────────────────────────────────────────────────────
+function build(){
+  buildHeaders();
+  buildRows();
+  buildStats();
+}
+
+function buildHeaders(){
+  // Month header
+  const rhM=document.getElementById('rhMonths');
+  rhM.innerHTML='';
+  MESES.forEach(m=>{
+    const exp=expandedMonths.has(m.nombre);
+    const w=exp?m.dias*DAY_W:MONTH_COLLAPSED_W;
+    const div=document.createElement('div');
+    div.className='rh-month'+(exp?'':' collapsed');
+    div.style.width=w+'px';div.style.height='28px';
+    div.style.flexShrink='0';
+    div.innerHTML=exp
+      ?`<span style="font-size:11px;font-weight:700;letter-spacing:.08em;">${m.label.toUpperCase()}</span>&nbsp;<span class="m-arrow">▾</span>`
+      :`<span style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:9px;font-weight:700;">${m.label}</span><span class="m-arrow" style="margin-top:4px;">▾</span>`;
+    div.onclick=()=>toggleMonth(m.nombre);
+    rhM.appendChild(div);
+  });
+
+  // Day numbers header
+  const rhD=document.getElementById('rhDays');
+  rhD.innerHTML='';
+  let dAbs=1;
+  MESES.forEach(m=>{
+    const exp=expandedMonths.has(m.nombre);
+    if(exp){
+      for(let d=1;d<=m.dias;d++,dAbs++){
+        const div=document.createElement('div');
+        div.className='rh-day'+(isWeekend(dAbs)?' we':'');
+        div.style.width=DAY_W+'px';div.style.height='22px';
+        div.textContent=d;
+        rhD.appendChild(div);
+      }
+    } else {
+      // Collapsed: just a spacer
+      const div=document.createElement('div');
+      div.className='rh-day';
+      div.style.width=MONTH_COLLAPSED_W+'px';div.style.height='22px';
+      div.style.background='rgba(0,0,0,.12)';
+      rhD.appendChild(div);
+      dAbs+=m.dias;
+    }
+  });
+}
+
+function buildRows(){
+  const leftBody=document.getElementById('leftBody');
+  const rightBody=document.getElementById('rightBody');
+  leftBody.innerHTML=''; rightBody.innerHTML='';
+
+  const progs=["FOMALASA","DH-DGB","AMA-DGETI","PRONAFOLE"];
+  progs.forEach(prog=>{
+    const cfg=PC[prog];
+    const hidden=!activeProgs.has(prog);
+    const items=DATA.filter(d=>d.prog===prog);
+    const progCollapsed=collapsedProgs.has(prog);
+
+    // ── PROG HEADER ROW ──────────────────────────
+    // Left
+    const lh=document.createElement('div');
+    lh.className='l-prog-hdr';
+    lh.style.background=cfg.color;
+    lh.style.display=hidden?'none':'';
+    lh.innerHTML=`<div class="l-prog-label">
+      <span style="font-size:16px">${cfg.icon}</span>
+      <span>${prog}</span>
+      <span style="font-size:10px;opacity:.65;font-weight:400">${items.length} act.</span>
+      <span class="chevron ${progCollapsed?'':'open'}">›</span>
+    </div>`;
+    lh.onclick=()=>toggleProgRows(prog);
+    leftBody.appendChild(lh);
+
+    // Right prog header
+    const rh=document.createElement('div');
+    rh.className='r-prog-hdr';
+    rh.style.background=cfg.light;
+    rh.style.display=hidden?'none':'';
+    buildRightHeaderRow(rh, cfg.light);
+    rightBody.appendChild(rh);
+
+    // ── ACTIVITY ROWS ────────────────────────────
+    items.forEach((item,idx)=>{
+      const isHid=hidden||progCollapsed||(activeAmbito&&item.ambito!==activeAmbito);
+      const rowBg=idx%2===0?'var(--surface)':'var(--alt)';
+
+      // Left row
+      const lr=document.createElement('div');
+      lr.className='l-row'+(isHid?' hidden':'');
+      lr.style.background=rowBg;
+
+      // Prog cell
+      const cp=document.createElement('div');
+      cp.className='l-cell lc-prog';
+      cp.style.color=cfg.color;
+      cp.style.borderRightColor=cfg.color+'55';
+      cp.textContent=prog;
+
+      // Act cell
+      const ca=document.createElement('div');
+      ca.className='l-cell lc-act';
+      ca.textContent=item.act;
+      ca.title='Clic para detalles';
+      ca.onclick=()=>openDetail(item.id);
+
+      // Resp cell
+      const cr=document.createElement('div');
+      cr.className='l-cell lc-resp';
+      const inp=document.createElement('input');
+      inp.type='text';inp.placeholder='Responsable…';inp.value=item.resp;
+      inp.onchange=e=>{item.resp=e.target.value;save();buildStats();};
+      cr.appendChild(inp);
+
+      // Ambito cell
+      const camb=document.createElement('div');
+      camb.className='l-cell lc-amb';
+      const selA=document.createElement('select');
+      selA.innerHTML='<option value="">— Ámbito —</option>'+AMBITOS.map(a=>`<option ${a===item.ambito?'selected':''}>${a}</option>`).join('');
+      selA.onchange=e=>{item.ambito=e.target.value;item.prop='';save();build();};
+      camb.appendChild(selA);
+
+      lr.append(cp,ca,cr,camb);
+      leftBody.appendChild(lr);
+
+      // Right row
+      const rr=document.createElement('div');
+      rr.className='r-row'+(isHid?' hidden':'');
+      rr.style.background=rowBg;
+      buildRightRow(rr, item, cfg);
+      rightBody.appendChild(rr);
+    });
+  });
+
+  // Sync heights — left drives right
+  syncHeights(leftBody, rightBody);
+}
+
+function buildRightHeaderRow(container, bgColor){
+  MESES.forEach(m=>{
+    const exp=expandedMonths.has(m.nombre);
+    if(exp){
+      let dAbs=DIAS_ACUM[m.nombre]+1;
+      for(let d=1;d<=m.dias;d++,dAbs++){
+        const cell=document.createElement('div');
+        cell.className='r-day'+(isWeekend(dAbs)?' we':'');
+        cell.style.width=DAY_W+'px';
+        cell.style.background=bgColor;
+        container.appendChild(cell);
+      }
+    } else {
+      const cell=document.createElement('div');
+      cell.className='r-month-collapsed';
+      cell.style.width=MONTH_COLLAPSED_W+'px';
+      cell.style.background=bgColor;
+      container.appendChild(cell);
+    }
+  });
+}
+
+function buildRightRow(container, item, cfg){
+  const ini=dayAbs(item.mesIni,item.dIni);
+  const fin=dayAbs(item.mesFin,item.dFin);
+
+  MESES.forEach(m=>{
+    const exp=expandedMonths.has(m.nombre);
+    const mStart=DIAS_ACUM[m.nombre]+1;
+    const mEnd=DIAS_ACUM[m.nombre]+m.dias;
+    const hasActivity=ini<=mEnd && fin>=mStart;
+
+    if(exp){
+      let dAbs=mStart;
+      for(let d=1;d<=m.dias;d++,dAbs++){
+        const cell=document.createElement('div');
+        cell.className='r-day'+(isWeekend(dAbs)?' we':'');
+        cell.style.width=DAY_W+'px';
+
+        // Click = toggle this individual day on/off
+        const _id=item.id;
+        const _dAbs=dAbs;
+        cell.onclick=(()=>{
+          return ()=>{
+            const itm=DATA.find(x=>x.id===_id);
+            if(!itm) return;
+            // Use a Set of active absolute days
+            if(!itm.days) itm.days=buildDaysSet(itm);
+            if(itm.days.has(_dAbs)){
+              itm.days.delete(_dAbs);
+            } else {
+              itm.days.add(_dAbs);
+            }
+            // Sync back to mesIni/dIni/mesFin/dFin from the set
+            syncRangeFromDays(itm);
+            save(); build();
+          };
+        })();
+
+        if(!item.days) item.days=buildDaysSet(item);
+        if(ini>0 && item.days.has(dAbs)){
+          const bar=document.createElement('div');
+          const prevActive=item.days.has(dAbs-1);
+          const nextActive=item.days.has(dAbs+1);
+          let cls='bar';
+          if(!prevActive&&!nextActive) cls+=' bo';
+          else if(!prevActive) cls+=' bs';
+          else if(!nextActive) cls+=' be';
+          bar.className=cls;
+          bar.style.background=cfg.color;
+          cell.appendChild(bar);
+        }
+        container.appendChild(cell);
+      }
+    } else {
+      // Collapsed month: show mini indicator
+      const cell=document.createElement('div');
+      cell.className='r-month-collapsed'+(hasActivity?' has-activity':'');
+      cell.style.width=MONTH_COLLAPSED_W+'px';
+      cell.title=`${m.label}: ${hasActivity?'tiene actividad':'sin actividad'}`;
+      cell.onclick=()=>toggleMonth(m.nombre);
+
+      if(hasActivity){
+        const mini=document.createElement('div');
+        mini.className='mini-bar';
+        mini.style.background=cfg.color;
+        cell.appendChild(mini);
+      }
+      container.appendChild(cell);
+    }
+  });
+}
+
+function syncHeights(leftBody, rightBody){
+  // Make both sides have matching row heights
+  const lRows=[...leftBody.children];
+  const rRows=[...rightBody.children];
+  lRows.forEach((lr,i)=>{
+    if(rRows[i]){
+      // Reset first
+      lr.style.minHeight='';
+      rRows[i].style.minHeight='';
+    }
+  });
+}
+
+// ── TOGGLE ───────────────────────────────────────────────────
+function toggleMonth(nombre){
+  if(expandedMonths.has(nombre)) expandedMonths.delete(nombre);
+  else expandedMonths.add(nombre);
+  build();
+}
+function expandAll(){ MESES.forEach(m=>expandedMonths.add(m.nombre)); build(); }
+function collapseAll(){ MESES.forEach(m=>expandedMonths.delete(m.nombre)); build(); }
+
+function toggleProgRows(prog){
+  if(collapsedProgs.has(prog)) collapsedProgs.delete(prog);
+  else collapsedProgs.add(prog);
+  buildRows();
+  buildStats();
+}
+
+function toggleProg(btn){
+  const p=btn.dataset.prog;
+  if(activeProgs.has(p)){activeProgs.delete(p);btn.classList.remove('on');}
+  else{activeProgs.add(p);btn.classList.add('on');}
+  build();
+}
+function filterAmbito(v){activeAmbito=v;build();}
+
+// ── STATS ─────────────────────────────────────────────────────
+function buildStats(){
+  const bar=document.getElementById('statsBar');
+  const vis=DATA.filter(d=>activeProgs.has(d.prog)&&(!activeAmbito||d.ambito===activeAmbito));
+  const cr=vis.filter(d=>d.resp.trim()).length;
+  bar.innerHTML=`
+    <div class="stat"><div class="sdot" style="background:var(--accent)"></div><div><div class="sn">${vis.length}</div><div class="sl">Actividades</div></div></div>
+    ${["FOMALASA","DH-DGB","AMA-DGETI","PRONAFOLE"].map(p=>{
+      const n=DATA.filter(d=>d.prog===p&&activeProgs.has(p)&&(!activeAmbito||d.ambito===activeAmbito)).length;
+      return `<div class="stat"><div class="sdot" style="background:${PC[p].color}"></div><div><div class="sn">${n}</div><div class="sl">${p}</div></div></div>`;
+    }).join('')}
+    <div class="stat"><div class="sdot" style="background:#27AE60"></div><div><div class="sn">${cr}/${vis.length}</div><div class="sl">Con responsable</div></div></div>`;
+}
+
+// ── DETAIL PANEL ──────────────────────────────────────────────
+function openDetail(id){
+  const item=DATA.find(d=>d.id===id);if(!item)return;
+  openId=id;
+  const cfg=PC[item.prog];
+  const ps=item.ambito?(PROPS[item.ambito]||[]):[];
+  document.getElementById('dpanelContent').innerHTML=`
+    <div class="dp-badge" style="background:${cfg.color}">${cfg.icon} ${item.prog}</div>
+    <div class="dp-ttl">${item.act}</div>
+    <div class="dp-datehint">📅 <strong>${item.mesIni} ${item.dIni}</strong> — <strong>${item.mesFin} ${item.dFin}</strong> &nbsp;·&nbsp; Clic en días del Gantt para cambiar</div>
+    <div class="dpf"><label>Responsable</label><input id="d_r" type="text" value="${item.resp}" placeholder="Nombre del responsable…"></div>
+    <hr class="dp-hr">
+    <div class="dpf"><label>Ámbito FSE</label>
+      <select id="d_a" onchange="dChgAmb(this)">
+        <option value="">— Seleccionar —</option>
+        ${AMBITOS.map(a=>`<option ${a===item.ambito?'selected':''}>${a}</option>`).join('')}
+      </select>
+    </div>
+    <div class="dpf"><label>Propósito Formativo</label>
+      <select id="d_p">
+        <option value="">— Seleccionar —</option>
+        ${ps.map(p=>`<option ${p===item.prop?'selected':''}>${p}</option>`).join('')}
+      </select>
+    </div>
+    <hr class="dp-hr">
+    <div class="dpf"><label>Observaciones</label><textarea id="d_o">${item.obs||''}</textarea></div>
+    <button class="dp-save" onclick="saveDetail()">💾 Guardar cambios</button>`;
+  document.getElementById('dpanel').classList.add('open');
+}
+function dChgAmb(el){
+  const ps=PROPS[el.value]||[];
+  document.getElementById('d_p').innerHTML='<option value="">— Seleccionar —</option>'+ps.map(p=>`<option>${p}</option>`).join('');
+}
+function saveDetail(){
+  const item=DATA.find(d=>d.id===openId);if(!item)return;
+  item.resp=document.getElementById('d_r').value;
+  item.ambito=document.getElementById('d_a').value;
+  item.prop=document.getElementById('d_p').value;
+  item.obs=document.getElementById('d_o').value;
+  save();closeDetail();build();
+}
+function closeDetail(){document.getElementById('dpanel').classList.remove('open');openId=null;}
+
+function exportData(){
+  const b=new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='gantt_sems_2026.json';a.click();
+}
+
+// Sync vertical scroll between left and right panels
+window.addEventListener('DOMContentLoaded',()=>{
+  const lb=document.getElementById('leftBody');
+  const rb=document.getElementById('rightBody');
+  if(lb&&rb){
+    const gr=document.getElementById('gRight');
+    const gl=document.getElementById('gLeft');
+    gr.addEventListener('scroll',()=>{ gl.scrollTop=gr.scrollTop; });
+    gl.addEventListener('scroll',()=>{ gr.scrollTop=gl.scrollTop; });
+  }
+});
+
+// Make gantt fill window height
+function setHeight(){
+  const wrap=document.getElementById('ganttWrap');
+  const top=wrap.getBoundingClientRect().top;
+  wrap.style.height=(window.innerHeight-top)+'px';
+  wrap.style.overflowY='auto';
+  document.getElementById('gLeft').style.height='100%';
+  document.getElementById('gLeft').style.overflowY='auto';
+  document.getElementById('gRight').style.height='100%';
+  document.getElementById('gRight').style.overflowY='auto';
+}
+window.addEventListener('resize',setHeight);
+setTimeout(setHeight,50);
+
+build();
+</script>
+</body>
+</html>
