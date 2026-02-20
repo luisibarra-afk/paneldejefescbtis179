@@ -16,7 +16,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
-/* ── HEADER ── */
+/* HEADER */
 .site-header{background:var(--guinda-d);position:relative;overflow:hidden;}
 .site-header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 24px,rgba(255,255,255,.025) 24px,rgba(255,255,255,.025) 25px);}
 .header-inner{position:relative;z-index:1;padding:20px 32px;display:flex;align-items:center;gap:16px;}
@@ -26,18 +26,18 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .header-back{margin-left:auto;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;color:#fff;text-decoration:none;transition:background .15s;}
 .header-back:hover{background:rgba(255,255,255,.2);}
 
-/* ── NAV ── */
+/* NAV */
 .site-nav{background:var(--guinda-d);border-bottom:2px solid var(--oro);display:flex;padding:0 32px;}
 .site-nav a{padding:10px 18px;font-size:10px;font-weight:600;color:rgba(255,255,255,.45);text-decoration:none;text-transform:uppercase;letter-spacing:.08em;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;}
 .site-nav a:hover{color:rgba(255,255,255,.8);}
 .site-nav a.active{color:#fff;border-bottom-color:var(--oro);}
 
-/* ── META ── */
+/* META */
 .meta-strip{background:var(--surface);border-bottom:1px solid var(--border);padding:8px 32px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
 .meta-pill{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);padding:3px 10px;background:var(--bg);border:1px solid var(--border);border-radius:20px;}
 .meta-pill strong{color:var(--text);font-weight:600;}
 
-/* ── STATS ── */
+/* STATS */
 .stats-bar{display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-bottom:1px solid var(--border);}
 .stat-cell{padding:12px 20px;border-right:1px solid var(--border);display:flex;align-items:center;gap:10px;}
 .stat-cell:last-child{border-right:none;}
@@ -45,95 +45,68 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .stat-num{font-family:'Playfair Display',serif;font-size:20px;line-height:1;}
 .stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:1px;}
 
-/* ── MAIN ── */
-.main{padding:32px;max-width:960px;margin:0 auto;}
-.page-title{font-family:'Playfair Display',serif;font-size:26px;color:var(--guinda);margin-bottom:4px;}
-.page-sub{font-size:12px;color:var(--muted);margin-bottom:28px;font-weight:300;}
+/* MAIN */
+.main{padding:28px 32px;max-width:960px;margin:0 auto;}
+.page-title{font-family:'Playfair Display',serif;font-size:24px;color:var(--guinda);margin-bottom:4px;}
+.page-sub{font-size:12px;color:var(--muted);margin-bottom:24px;font-weight:300;}
 
-/* ── PROGRAM BUTTONS ── */
-.prog-buttons{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px;}
+/* PROGRAM BUTTONS */
+.prog-buttons{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px;}
 .prog-btn{
   display:flex;align-items:center;gap:10px;
-  padding:12px 18px;
-  border-radius:12px;
-  border:2px solid;
-  background:var(--card);
-  cursor:pointer;font-family:'Outfit',sans-serif;
-  transition:all .18s;
-  flex:1;min-width:180px;
+  padding:12px 18px;border-radius:12px;border:2px solid;
+  background:var(--card);cursor:pointer;
+  font-family:'Outfit',sans-serif;transition:all .18s;
+  flex:1;min-width:200px;text-align:left;
 }
 .prog-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.1);}
 .prog-btn.active{color:#fff !important;}
-.prog-btn .pb-icon{font-size:18px;flex-shrink:0;}
-.prog-btn .pb-text{flex:1;text-align:left;}
-.prog-btn .pb-name{font-size:12px;font-weight:700;line-height:1.2;}
-.prog-btn .pb-resp{font-size:9px;opacity:.7;margin-top:2px;font-weight:400;}
-.prog-btn .pb-arr{font-size:16px;opacity:.6;transition:transform .2s;}
+.pb-icon{font-size:18px;flex-shrink:0;}
+.pb-text{flex:1;}
+.pb-name{font-size:12px;font-weight:700;line-height:1.2;}
+.pb-resp{font-size:9px;opacity:.7;margin-top:2px;}
+.pb-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.pb-pct{font-size:11px;font-weight:700;background:rgba(0,0,0,.08);border-radius:20px;padding:2px 8px;white-space:nowrap;}
+.pb-arr{font-size:18px;opacity:.65;transition:transform .2s;line-height:1;}
 .prog-btn.active .pb-arr{transform:rotate(90deg);}
-.prog-btn .pb-pct{
-  font-size:11px;font-weight:700;
-  background:rgba(0,0,0,.1);
-  border-radius:20px;padding:2px 8px;
-  white-space:nowrap;
-}
 
-/* ── ACCORDION PANEL ── */
+/* ACCORDION PANEL */
 .acc-panel{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:16px;
-  overflow:hidden;
-  margin-bottom:16px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;overflow:hidden;margin-bottom:16px;
   box-shadow:0 2px 12px rgba(0,0,0,.05);
   display:none;
 }
 .acc-panel.open{display:block;animation:slideDown .22s ease;}
 @keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
 
-/* panel header bar */
-.acc-hbar{
-  display:flex;align-items:center;gap:14px;
-  padding:16px 24px;
-}
+.acc-hbar{display:flex;align-items:center;gap:14px;padding:16px 24px;}
 .acc-hbar-icon{font-size:22px;}
+.acc-hbar-info{flex:1;}
 .acc-hbar-title{font-family:'Playfair Display',serif;font-size:17px;color:#fff;}
 .acc-hbar-resp{font-size:11px;color:rgba(255,255,255,.65);margin-top:2px;}
-.acc-hbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
-.acc-hbar-pct{font-size:13px;font-weight:700;color:#fff;}
+.acc-hbar-pct{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;}
 
-/* progress strip */
 .acc-strip{height:5px;}
 .acc-strip-fill{height:100%;transition:width .4s;}
 
-/* alert */
 .acc-alert{margin:14px 24px 0;padding:10px 14px;border-radius:9px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:8px;}
 
-/* activities */
 .acc-body{padding:16px 24px 24px;}
-.act-item{
-  display:grid;
-  grid-template-columns:32px 1fr auto;
-  align-items:start;
-  gap:12px;
-  padding:12px 0;
-  border-bottom:1px solid var(--border);
-}
+
+/* ACTIVITIES */
+.act-item{display:grid;grid-template-columns:32px 1fr auto;align-items:start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
 .act-item:last-child{border-bottom:none;}
-.act-num{
-  width:32px;height:32px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;font-weight:700;color:#fff;flex-shrink:0;
-}
-.act-text{font-size:13px;line-height:1.6;color:var(--text);padding-top:6px;}
+.act-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
+.act-text{font-size:13px;line-height:1.6;color:var(--text);padding-top:5px;}
 .act-text strong{font-weight:600;}
 
-/* STATUS BTN */
+/* STATUS BUTTON */
 .status-btn{
   flex-shrink:0;border-radius:20px;padding:6px 14px;
   font-size:10px;font-weight:700;letter-spacing:.05em;
-  border:1px solid;cursor:pointer;
-  font-family:'Outfit',sans-serif;
-  transition:all .15s;white-space:nowrap;margin-top:5px;
+  border:1px solid;cursor:pointer;font-family:'Outfit',sans-serif;
+  transition:all .15s;white-space:nowrap;margin-top:5px;outline:none;
 }
 .s-p{background:#EDEBE4;color:var(--muted);border-color:var(--border);}
 .s-p:hover{background:#E3E0D9;}
@@ -150,13 +123,21 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .obs-ta:focus{border-color:var(--guinda);}
 .obs-ta::placeholder{color:var(--lite);}
 .obs-row{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:10px;}
-.obs-saved-msg{font-size:11px;color:var(--green);font-weight:600;opacity:0;transition:opacity .3s;}
-.obs-saved-msg.show{opacity:1;}
-.btn-save{background:var(--guinda);color:#fff;border:none;border-radius:8px;padding:8px 20px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;gap:6px;}
+.obs-saved{font-size:11px;color:var(--green);font-weight:600;opacity:0;transition:opacity .3s;}
+.obs-saved.show{opacity:1;}
+.btn-save{background:var(--guinda);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;gap:6px;}
 .btn-save:hover{opacity:.85;}
 
+/* SYNC BAR */
+.sync-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:6px 32px;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--lite);flex-shrink:0;transition:background .3s;}
+.sync-dot.ok{background:var(--green);}
+.sync-dot.saving{background:var(--oro);animation:pulse .8s infinite;}
+.sync-dot.error{background:#991B1B;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
 /* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;background:#166534;color:#fff;padding:10px 18px;border-radius:10px;font-size:12px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.15);opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:999;}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--green);color:#fff;padding:10px 18px;border-radius:10px;font-size:12px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.15);opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:999;}
 .toast.show{opacity:1;transform:translateY(0);}
 
 /* FOOTER */
@@ -167,8 +148,8 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 @media(max-width:650px){
   .main{padding:16px;}
   .header-inner{padding:14px 16px;}
-  .prog-btn{min-width:calc(50% - 5px);}
   .stats-bar{grid-template-columns:repeat(3,1fr);}
+  .prog-btn{min-width:calc(50% - 5px);}
 }
 </style>
 </head>
@@ -179,7 +160,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
     <div class="header-icon">🔍</div>
     <div class="header-text">
       <h1>Supervisión de Programas Institucionales</h1>
-      <p>CBTis 179 · DGETI · Febrero – Julio 2026</p>
+      <p>CBTis 179 · DGETI · Febrero – Julio 2026 · Ciclo Escolar 2025–2026</p>
     </div>
     <a href="index.html" class="header-back">← Inicio</a>
   </div>
@@ -189,6 +170,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
   <a href="index.html">Inicio</a>
   <a href="gantt_sems.html">Programas Institucionales</a>
   <a href="supervision.html" class="active">Supervisión</a>
+  <a href="circulares.html">Circulares</a>
 </nav>
 
 <div class="meta-strip">
@@ -201,20 +183,21 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 
 <div class="stats-bar">
   <div class="stat-cell"><div class="stat-dot" style="background:var(--guinda)"></div><div><div class="stat-num">7</div><div class="stat-lbl">Programas</div></div></div>
-  <div class="stat-cell"><div class="stat-dot" style="background:#444"></div><div><div class="stat-num" id="s-total">-</div><div class="stat-lbl">Actividades</div></div></div>
+  <div class="stat-cell"><div class="stat-dot" style="background:#444"></div><div><div class="stat-num" id="s-total">—</div><div class="stat-lbl">Actividades</div></div></div>
   <div class="stat-cell"><div class="stat-dot" style="background:var(--green)"></div><div><div class="stat-num" id="s-comp">0</div><div class="stat-lbl">Completadas</div></div></div>
   <div class="stat-cell"><div class="stat-dot" style="background:var(--yellow)"></div><div><div class="stat-num" id="s-proc">0</div><div class="stat-lbl">En proceso</div></div></div>
   <div class="stat-cell"><div class="stat-dot" style="background:var(--guinda)"></div><div><div class="stat-num" id="s-pct">0%</div><div class="stat-lbl">Avance global</div></div></div>
 </div>
 
+<div class="sync-bar">
+  <div class="sync-dot" id="syncDot"></div>
+  <span id="syncMsg">Conectando con Google Sheets…</span>
+</div>
+
 <div class="main">
   <div class="page-title">Plan de Trabajo Feb – Jul 2026</div>
-  <div class="page-sub">Selecciona un programa para ver sus actividades · Cambia el estatus de cada actividad · Guarda observaciones y evidencias</div>
-
-  <!-- PROGRAM BUTTONS -->
+  <div class="page-sub">Selecciona un programa para ver sus actividades · Toca el estatus para cambiarlo · Los cambios se guardan automáticamente en este navegador</div>
   <div class="prog-buttons" id="progButtons"></div>
-
-  <!-- ACCORDION PANELS (one per program, shown below buttons) -->
   <div id="panels"></div>
 </div>
 
@@ -223,76 +206,120 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
   <span>SEP · DGETI · SEMS · Hidalgo</span>
 </footer>
 
-<div class="toast" id="toast">✓ Guardado</div>
+<div class="toast" id="toast"></div>
 
 <script>
-const PROGS = [
-  { id:'dual',      nombre:'Educación Dual',             resp:'Tec. Ernesto Sosa Ángeles',               icon:'🏭', color:'#1A4F7A', light:'#EAF2FA', alert:null,
-    acts:['Continuar contactando empresas de la región vía digital, telefónica y presencial para incorporarlas al Modelo de Educación Dual.',
-          'Incorporar 10 nuevos alumnos al semestre Feb–Jul 2026: ARH 4° (GRUPO DICSE TUL, CIR-FAR), Electricidad 4° (DICSE TUL, CIR-FAR, GUZHER), Arquitectura 4° (CIR-FAR, Servicios de Arquitectura).',
-          'Mantener activos a un total de 22 alumnos en el modelo dual durante el ciclo escolar 2025–2026.',
-          'Dar seguimiento con tutores académicos en empresas y acompañar a los 6 docentes facilitadores del programa.']},
+// ══ CONFIGURACIÓN — pega tu URL de Apps Script aquí ══════════
+const API_URL = 'https://script.google.com/macros/s/AKfycbyulG3V4G0IhdU03dj2hwwTjSG3AMaGj6atYSDl7LUY-PhxQ55FBKCKhdavRLX0d-YV/exec';
+// Ejemplo: 'https://script.google.com/macros/s/AKfycb.../exec'
+// ═════════════════════════════════════════════════════════════
 
-  { id:'estrategia', nombre:'Estrategia en el Aula',     resp:'Ing. María Butrón Venegas',               icon:'🎓', color:'#0E6B59', light:'#E6F5F1', alert:null,
+const PROGS = [
+  { id:'dual',       nombre:'Educación Dual',              resp:'Tec. Ernesto Sosa Ángeles',               icon:'🏭', color:'#1A4F7A', light:'#EAF2FA', alert:null,
+    acts:['Continuar contactando empresas de la región vía digital, telefónica y presencial para incorporarlas al Modelo de Educación Dual.',
+          'Incorporar 10 nuevos alumnos: ARH 4° (GRUPO DICSE TUL, CIR-FAR), Electricidad 4° (DICSE TUL, CIR-FAR, GUZHER), Arquitectura 4° (CIR-FAR, Servicios de Arquitectura).',
+          'Mantener activos 22 alumnos en el modelo dual durante el ciclo 2025–2026.',
+          'Dar seguimiento con tutores académicos en empresas y acompañar a los 6 docentes facilitadores.']},
+  { id:'estrategia', nombre:'Estrategia en el Aula',       resp:'Ing. María Butrón Venegas',               icon:'🎓', color:'#0E6B59', light:'#E6F5F1', alert:null,
     acts:['Seguimiento e implementación de la Jornada de Menstruación Digna: donación de toallas sanitarias y toallitas húmedas.',
           'Seguimiento al cronograma del programa FOMALASA, manteniendo el apoyo del Sector Salud del municipio.',
-          'Continuidad a la Jornada de Prevención de Adicciones conforme a indicaciones de las autoridades competentes.',
-          'Difusión permanente de estilos de vida saludable con énfasis en alimentación y supervisión continua de la cafetería escolar.']},
-
-  { id:'mccems',    nombre:'MCCEMS 2025',                 resp:'Lic. Rodrigo Guillermo Hernández Escorza', icon:'📚', color:'#6B2D52', light:'#F3EBF0', alert:null,
+          'Continuidad a la Jornada de Prevención de Adicciones conforme a indicaciones de las autoridades.',
+          'Difusión permanente de estilos de vida saludable y supervisión continua de la cafetería escolar.']},
+  { id:'mccems',     nombre:'MCCEMS 2025',                  resp:'Lic. Rodrigo Guillermo Hernández Escorza', icon:'📚', color:'#6B2D52', light:'#F3EBF0', alert:null,
     acts:['<strong>MCCEMS 2023:</strong> Dar seguimiento a actividades, proyectos transversales, PEC y PAEC, currículum ampliado y evaluación formativa mediante supervisión en aula.',
-          '<strong>Trabajo colegiado:</strong> Fortalecer academias disciplinarias y transversales para diseño de situaciones de aprendizaje contextualizadas y coherencia entre planeación, enseñanza y evaluación.',
-          '<strong>Capacitación docente:</strong> Gestionar formación en enfoque humanista del MCCEMS, evaluación formativa e integración de ejes articuladores (inclusión, pensamiento crítico, vida saludable).',
-          '<strong>Corresponsabilidad:</strong> Fomentar clima institucional donde el cumplimiento del MCCEMS sea responsabilidad colectiva, reconociendo buenas prácticas y promoviendo liderazgo pedagógico.']},
-
-  { id:'escuela',   nombre:'La Escuela es Nuestra',       resp:'Mtro. Alberto Velázquez Ortega',          icon:'🏫', color:'#8B3A1A', light:'#FAF0EA',
-    alert:'⚠️ Avance previo: 70% · Monto otorgado: $1,500,000 MXN · Lab. Ciberseguridad Aula 21',
+          '<strong>Trabajo colegiado:</strong> Fortalecer academias para diseño de situaciones de aprendizaje contextualizadas y coherencia entre planeación, enseñanza y evaluación.',
+          '<strong>Capacitación docente:</strong> Gestionar formación en enfoque humanista del MCCEMS, evaluación formativa e integración de ejes articuladores.',
+          '<strong>Corresponsabilidad:</strong> Fomentar cultura de mejora continua, reconociendo buenas prácticas y promoviendo liderazgo pedagógico.']},
+  { id:'escuela',    nombre:'La Escuela es Nuestra',        resp:'Mtro. Alberto Velázquez Ortega',          icon:'🏫', color:'#8B3A1A', light:'#FAF0EA',
+    alert:'⚠️ Avance previo: 70% · Monto: $1,500,000 MXN · Lab. Ciberseguridad Aula 21',
     acts:['Instalación del servidor en el laboratorio de ciberseguridad (Aula 21).',
           'Instalación de los equipos de cómputo.',
           'Instalación de paquetería diversa.',
           'Pruebas de conectividad y red de datos.',
-          'Entrega y puesta en operación del laboratorio. Beneficiará a 50+ alumnos de la especialidad de ciberseguridad.']},
-
-  { id:'monae',     nombre:'MoNAE — ABC',                 resp:'Lic. Imelda Gómez Jiménez',              icon:'📖', color:'#5D3A1A', light:'#FAF0E4', alert:null,
-    acts:['Implementar el plan de trabajo 2026 elaborado por la coordinadora en atención a las problemáticas identificadas.',
-          'Asignar espacio de trabajo a la coordinadora del programa para mejor atención a los educandos.',
-          'Gestionar mayor tiempo de atención con la coordinadora del IHEA (mínimo dos días) para agilizar trámites de certificación.',
-          'Mantener grupos de WhatsApp activos para seguimiento, distribución de guías y formatos de trámite.',
-          'Difundir el programa entre alumnos de 5° semestre (matutino y vespertino) — ~374 alumnos.']},
-
-  { id:'pecpaec',   nombre:'PEC y PAEC',                  resp:'Lic. Betty Camargo Aparicio',             icon:'♻️', color:'#1A6B35', light:'#E6F5EC', alert:null,
+          'Entrega y puesta en operación del laboratorio (beneficiará a 50+ alumnos).']},
+  { id:'monae',      nombre:'MoNAE — ABC',                  resp:'Lic. Imelda Gómez Jiménez',              icon:'📖', color:'#5D3A1A', light:'#FAF0E4', alert:null,
+    acts:['Implementar el plan de trabajo 2026 elaborado por la coordinadora.',
+          'Asignar espacio de trabajo a la coordinadora del programa.',
+          'Gestionar mayor tiempo de atención con coordinadora del IHEA (mínimo 2 días).',
+          'Mantener grupos de WhatsApp para seguimiento y distribución de formatos.',
+          'Difundir el programa entre alumnos de 5° semestre (~374 alumnos).']},
+  { id:'pecpaec',    nombre:'PEC y PAEC',                   resp:'Lic. Betty Camargo Aparicio',             icon:'♻️', color:'#1A6B35', light:'#E6F5EC', alert:null,
     acts:['Continuar con academias del componente fundamental en actividades de recuperación de PET.',
           'Incorporar academias del componente laboral en nuevas propuestas de PECs para el PAEC "Liderazgo y ciudadanía".',
-          'Presentar el plan de trabajo Feb–Jul 2026 en actas de academias previas al inicio del semestre.',
+          'Presentar plan de trabajo Feb–Jul 2026 en actas de academias previas al inicio del semestre.',
           'Diseñar nuevas propuestas de PECs transversales con colaboración interdisciplinaria.']},
-
-  { id:'protcivil', nombre:'Protección Civil',            resp:'Lic. Luis Alberto Cruz Ortega',           icon:'🛡️', color:'#8B1A1A', light:'#FAE6E6', alert:null,
-    acts:['Mantenimiento y actualización de la señalética de emergencia existente en el plantel.',
-          'Rehabilitación de las salidas de emergencia del plantel.',
-          'Gestionar e impartir curso de capacitación en uso y operatividad de extintores para toda la comunidad del CBTis 179.',
-          'Realizar al menos un simulacro de evacuación por sismo con participación de toda la comunidad escolar.']},
+  { id:'protcivil',  nombre:'Protección Civil',             resp:'Lic. Luis Alberto Cruz Ortega',           icon:'🛡️', color:'#8B1A1A', light:'#FAE6E6', alert:null,
+    acts:['Mantenimiento y actualización de señalética de emergencia del plantel.',
+          'Rehabilitación de las salidas de emergencia.',
+          'Gestionar e impartir curso de capacitación en uso de extintores para toda la comunidad.',
+          'Realizar al menos un simulacro de evacuación por sismo con toda la comunidad escolar.']},
 ];
 
-// STATE
+const S_NEXT = {p:'e', e:'c', c:'p'};
+const S_LBL  = {p:'Pendiente', e:'En proceso', c:'Completado ✓'};
+const S_CLS  = {p:'s-p', e:'s-e', c:'s-c'};
+
+// STATE — se carga desde Sheets al iniciar
 const STATE = {};
 PROGS.forEach(p => { STATE[p.id] = { statuses: p.acts.map(()=>'p'), obs:'', open:false }; });
-try {
-  const sv = localStorage.getItem('sup_v5');
-  if(sv){ const d=JSON.parse(sv); PROGS.forEach(p=>{ if(d[p.id]){ STATE[p.id].statuses=d[p.id].statuses||STATE[p.id].statuses; STATE[p.id].obs=d[p.id].obs||''; }}); }
-} catch(e){}
 
-function persist(){ try{ localStorage.setItem('sup_v5', JSON.stringify(STATE)); }catch(e){} }
+// ── API ───────────────────────────────────────────────────────
+function setSyncStatus(state, msg){
+  const dot = document.getElementById('syncDot');
+  const txt = document.getElementById('syncMsg');
+  if(dot){ dot.className='sync-dot '+state; }
+  if(txt){ txt.textContent=msg; }
+}
 
-const S_LBL = { p:'Pendiente', e:'En proceso', c:'Completado ✓' };
-const S_CLS = { p:'s-p', e:'s-e', c:'s-c' };
-const S_NEXT = { p:'e', e:'c', c:'p' };
+async function apiGet(params){
+  const url = API_URL+'?'+new URLSearchParams(params);
+  const res  = await fetch(url);
+  return res.json();
+}
+
+async function apiPost(body){
+  const res = await fetch(API_URL,{method:'POST',body:JSON.stringify(body)});
+  return res.json();
+}
+
+async function loadFromSheets(){
+  setSyncStatus('saving','Cargando desde Google Sheets…');
+  try{
+    const data = await apiGet({action:'sup_getAll'});
+    if(data.error) throw new Error(data.error);
+    (data.rows||[]).forEach(r=>{
+      const pid = r.programa;
+      if(!STATE[pid]) return;
+      if(r.actividad_idx==='obs'){
+        STATE[pid].obs = r.observaciones||'';
+      } else {
+        const idx=parseInt(r.actividad_idx);
+        if(!isNaN(idx) && idx>=0 && idx<STATE[pid].statuses.length){
+          STATE[pid].statuses[idx] = r.estatus||'p';
+        }
+      }
+    });
+    setSyncStatus('ok','Sincronizado ✓');
+  } catch(e){
+    setSyncStatus('error','Error al cargar: '+e.message);
+    showToast('⚠ Sin conexión — usando datos locales');
+    // Fallback to localStorage
+    try{
+      const sv=localStorage.getItem('sup_cbti_v6');
+      if(sv){ const d=JSON.parse(sv); PROGS.forEach(p=>{ if(d[p.id]){ STATE[p.id].statuses=d[p.id].statuses||STATE[p.id].statuses; STATE[p.id].obs=d[p.id].obs||''; }}); }
+    } catch(e2){}
+  }
+  // Render after load
+  PROGS.forEach(p=>renderBtn(p));
+  updateStats();
+}
 
 function pct(pid){
   const s=STATE[pid].statuses;
-  return Math.round((s.filter(x=>x==='c').length + s.filter(x=>x==='e').length*.5)/s.length*100);
+  return Math.round((s.filter(x=>x==='c').length+s.filter(x=>x==='e').length*.5)/s.length*100);
 }
 
-function updateGlobalStats(){
+function updateStats(){
   let total=0,comp=0,proc=0;
   PROGS.forEach(p=>{ total+=p.acts.length; comp+=STATE[p.id].statuses.filter(x=>x==='c').length; proc+=STATE[p.id].statuses.filter(x=>x==='e').length; });
   document.getElementById('s-total').textContent=total;
@@ -301,36 +328,41 @@ function updateGlobalStats(){
   document.getElementById('s-pct').textContent=Math.round((comp+proc*.5)/total*100)+'%';
 }
 
-function showToast(msg){ const t=document.getElementById('toast'); t.textContent='✓ '+(msg||'Guardado'); t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2000); }
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg.startsWith('⚠')?msg:'✓ '+msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>t.classList.remove('show'),2500);
+}
 
 // ── RENDER BUTTON ──
 function renderBtn(p){
   const pc=pct(p.id);
-  const active=STATE[p.id].open;
+  const act=STATE[p.id].open;
   const btn=document.getElementById('btn-'+p.id);
-  btn.className='prog-btn'+(active?' active':'');
+  if(!btn) return;
   btn.style.borderColor=p.color;
-  btn.style.color=active?'#fff':p.color;
-  btn.style.background=active?p.color:var_card();
+  btn.style.color=act?'#fff':p.color;
+  btn.style.background=act?p.color:'#fff';
+  btn.className='prog-btn'+(act?' active':'');
   btn.innerHTML=`
     <span class="pb-icon">${p.icon}</span>
     <span class="pb-text">
       <span class="pb-name">${p.nombre}</span>
       <span class="pb-resp">${p.resp}</span>
     </span>
-    <span class="pb-pct" style="background:${active?'rgba(255,255,255,.2)':'rgba(0,0,0,.06)'};">${pc}%</span>
-    <span class="pb-arr">${active?'▾':'›'}</span>
-  `;
+    <span class="pb-right">
+      <span class="pb-pct">${pc}%</span>
+      <span class="pb-arr">${act?'▾':'›'}</span>
+    </span>`;
 }
-
-function var_card(){ return '#FFFFFF'; }
 
 // ── RENDER PANEL ──
 function renderPanel(p){
   const st=STATE[p.id];
   const pc=pct(p.id);
   const nums=p.id==='escuela'?['A','B','C','D','E']:p.acts.map((_,i)=>i+1);
-
   const acts=p.acts.map((a,i)=>{
     const s=st.statuses[i];
     return `<div class="act-item">
@@ -339,21 +371,20 @@ function renderPanel(p){
       <button class="status-btn ${S_CLS[s]}" onclick="cycleStatus('${p.id}',${i})">${S_LBL[s]}</button>
     </div>`;
   }).join('');
-
   const alertHtml=p.alert?`<div class="acc-alert" style="background:${p.light};border:1px solid ${p.color}40;color:${p.color}">${p.alert}</div>`:'';
 
   document.getElementById('panel-'+p.id).innerHTML=`
     <div class="acc-hbar" style="background:${p.color}">
       <span class="acc-hbar-icon">${p.icon}</span>
-      <div>
+      <div class="acc-hbar-info">
         <div class="acc-hbar-title">${p.nombre}</div>
         <div class="acc-hbar-resp">${p.resp}</div>
       </div>
-      <div class="acc-hbar-right">
-        <span class="acc-hbar-pct">${pc}% completado</span>
-      </div>
+      <div class="acc-hbar-pct">${pc}% completado</div>
     </div>
-    <div class="acc-strip" style="background:rgba(0,0,0,.08)"><div class="acc-strip-fill" style="width:${pc}%;background:${p.color}"></div></div>
+    <div class="acc-strip" style="background:rgba(0,0,0,.08)">
+      <div class="acc-strip-fill" style="width:${pc}%;background:${p.color}"></div>
+    </div>
     ${alertHtml}
     <div class="acc-body">
       <div>${acts}</div>
@@ -361,75 +392,86 @@ function renderPanel(p){
         <div class="obs-lbl">Observaciones / Evidencias</div>
         <textarea class="obs-ta" id="obs-${p.id}" placeholder="Escribe observaciones, evidencias o avances del programa…">${st.obs}</textarea>
         <div class="obs-row">
-          <span class="obs-saved-msg" id="saved-${p.id}">✓ Guardado</span>
+          <span class="obs-saved" id="saved-${p.id}">✓ Guardado</span>
           <button class="btn-save" onclick="saveObs('${p.id}')">💾 Guardar nota</button>
         </div>
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
 // ── TOGGLE ──
 function toggleProg(pid){
   const wasOpen=STATE[pid].open;
-  // close all
   PROGS.forEach(p=>{ STATE[p.id].open=false; document.getElementById('panel-'+p.id).className='acc-panel'; });
-  // if was closed, open this one
   if(!wasOpen){
     STATE[pid].open=true;
     renderPanel(PROGS.find(p=>p.id===pid));
-    const panel=document.getElementById('panel-'+pid);
-    panel.className='acc-panel open';
-    // scroll to panel
-    setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),50);
+    document.getElementById('panel-'+pid).className='acc-panel open';
+    setTimeout(()=>document.getElementById('panel-'+pid).scrollIntoView({behavior:'smooth',block:'nearest'}),50);
   }
-  // re-render all buttons
   PROGS.forEach(p=>renderBtn(p));
 }
 
-// ── CYCLE STATUS ──
-function cycleStatus(pid, idx){
-  STATE[pid].statuses[idx]=S_NEXT[STATE[pid].statuses[idx]];
-  persist();
+// ── CYCLE STATUS — guarda en Sheets ──
+async function cycleStatus(pid, idx){
+  const newStatus = S_NEXT[STATE[pid].statuses[idx]];
+  STATE[pid].statuses[idx] = newStatus;
+  // Optimistic UI
   renderPanel(PROGS.find(p=>p.id===pid));
   PROGS.forEach(p=>renderBtn(p));
-  updateGlobalStats();
+  updateStats();
+  setSyncStatus('saving','Guardando…');
+  try{
+    await apiPost({action:'sup_saveStatus', programa:pid, actividad_idx:idx, estatus:newStatus, usuario:'—'});
+    setSyncStatus('ok','Guardado en Sheets ✓');
+    showToast('Estatus actualizado');
+    // Fallback local cache
+    try{ const cache={}; PROGS.forEach(p=>{cache[p.id]={statuses:STATE[p.id].statuses,obs:STATE[p.id].obs};}); localStorage.setItem('sup_cbti_v6',JSON.stringify(cache)); }catch(e){}
+  } catch(e){
+    setSyncStatus('error','Error: '+e.message);
+    showToast('⚠ No se pudo guardar en Sheets');
+  }
 }
 
-// ── SAVE OBS ──
-function saveObs(pid){
+// ── SAVE OBS — guarda en Sheets ──
+async function saveObs(pid){
   const ta=document.getElementById('obs-'+pid);
-  if(!ta)return;
+  if(!ta) return;
   STATE[pid].obs=ta.value;
-  persist();
-  const el=document.getElementById('saved-'+pid);
-  if(el){ el.classList.add('show'); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),2000); }
-  showToast('Nota guardada');
+  const btn=ta.parentElement.querySelector('.btn-save');
+  if(btn) btn.disabled=true;
+  setSyncStatus('saving','Guardando…');
+  try{
+    await apiPost({action:'sup_saveObs', programa:pid, observaciones:ta.value, usuario:'—'});
+    setSyncStatus('ok','Guardado en Sheets ✓');
+    const el=document.getElementById('saved-'+pid);
+    if(el){el.classList.add('show');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2200);}
+    showToast('Nota guardada');
+    try{ const cache={}; PROGS.forEach(p=>{cache[p.id]={statuses:STATE[p.id].statuses,obs:STATE[p.id].obs};}); localStorage.setItem('sup_cbti_v6',JSON.stringify(cache)); }catch(e){}
+  } catch(e){
+    setSyncStatus('error','Error: '+e.message);
+    showToast('⚠ No se pudo guardar');
+  } finally{
+    if(btn) btn.disabled=false;
+  }
 }
 
 // ── INIT ──
 function init(){
-  // Build buttons
   const btnsEl=document.getElementById('progButtons');
+  const panelsEl=document.getElementById('panels');
   PROGS.forEach(p=>{
     const btn=document.createElement('button');
     btn.id='btn-'+p.id;
-    btn.className='prog-btn';
     btn.onclick=()=>toggleProg(p.id);
     btnsEl.appendChild(btn);
     renderBtn(p);
-  });
-
-  // Build panels (hidden)
-  const panelsEl=document.getElementById('panels');
-  PROGS.forEach(p=>{
     const div=document.createElement('div');
     div.className='acc-panel';
     div.id='panel-'+p.id;
     panelsEl.appendChild(div);
   });
-
-  updateGlobalStats();
+  loadFromSheets();
 }
 
 init();
