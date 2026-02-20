@@ -217,6 +217,12 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
   <div class="stat-cell"><div class="stat-dot" style="background:var(--green)"></div><div><div class="stat-num" id="st-aten">0</div><div class="stat-lbl">Atendidas</div></div></div>
 </div>
 
+<div class="sync-bar">
+  <div class="sync-dot" id="syncDot"></div>
+  <span id="syncMsg">Conectando con Google Sheets…</span>
+  <button onclick="loadFromSheets()" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:6px;padding:3px 12px;font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Outfit',sans-serif">🔄 Actualizar</button>
+</div>
+
 <div class="main">
   <div class="page-title">Registro de Circulares</div>
   <div class="page-sub">Carga circulares de DGETI, SEMS u otras instancias · Registra quién las atendió y cuándo · Adjunta archivos o enlaces de conferencias</div>
@@ -391,16 +397,53 @@ let atenId = null;
 let fileDataUrl = null;
 let fileNameStr = null;
 
-try {
-  const sv = localStorage.getItem('circ_cbti_v1');
-  if(sv) CIRCULARES = JSON.parse(sv);
-} catch(e){}
-
-function persist(){
-  try{ localStorage.setItem('circ_cbti_v1', JSON.stringify(CIRCULARES)); }catch(e){}
-}
+// ══ CONFIGURACIÓN — pega tu URL de Apps Script aquí ══════════
+const API_URL = 'https://script.google.com/macros/s/AKfycbyulG3V4G0IhdU03dj2hwwTjSG3AMaGj6atYSDl7LUY-PhxQ55FBKCKhdavRLX0d-YV/exec';
+// ═════════════════════════════════════════════════════════════
 
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+// ── API ───────────────────────────────────────────────────────
+function setSyncStatus(state, msg){
+  const dot=document.getElementById('syncDot');
+  const txt=document.getElementById('syncMsg');
+  if(dot) dot.className='sync-dot '+state;
+  if(txt) txt.textContent=msg;
+}
+
+async function apiGet(params){
+  const url=API_URL+'?'+new URLSearchParams(params);
+  const res=await fetch(url);
+  return res.json();
+}
+
+async function apiPost(body){
+  const res=await fetch(API_URL,{method:'POST',body:JSON.stringify(body)});
+  return res.json();
+}
+
+async function loadFromSheets(){
+  setSyncStatus('saving','Cargando desde Google Sheets…');
+  document.getElementById('circList').innerHTML='<div class="empty-state"><div class="spinner"></div><p>Cargando…</p></div>';
+  try{
+    const data=await apiGet({action:'circ_getAll'});
+    if(data.error) throw new Error(data.error);
+    CIRCULARES=(data.rows||[]).map(r=>({
+      id:r.id, num:r.num, area:r.area, titulo:r.titulo, desc:r.desc,
+      emision:r.emision, limite:r.limite, responsable:r.responsable,
+      estatus:r.estatus||'Pendiente',
+      links:Array.isArray(r.links)?r.links:[],
+      fileName:r.fileName, fileData:null, // files not stored in sheets
+      atendidoPor:r.atendidoPor, atendidoFecha:r.atendidoFecha, atendidoObs:r.atendidoObs
+    }));
+    setSyncStatus('ok','Sincronizado ✓');
+  } catch(e){
+    setSyncStatus('error','Error: '+e.message);
+    // Fallback localStorage
+    try{ const sv=localStorage.getItem('circ_cbti_v1'); if(sv) CIRCULARES=JSON.parse(sv); }catch(e2){}
+  }
+  renderList();
+}
 
 // ── STATUS CONFIG ─────────────────────────────────────────
 const S_COLOR = { Pendiente:'#8C8479', 'En proceso':'#854D0E', Atendida:'#166534' };
@@ -503,19 +546,23 @@ function updateStats(){
 }
 
 // ── CYCLE STATUS ──────────────────────────────────────────
-function cycleStatus(id){
+async function cycleStatus(id){
   const c = CIRCULARES.find(x=>x.id===id);
   if(!c) return;
   if(c.estatus==='Atendida'){
-    // Undo
     c.estatus='Pendiente'; c.atendidoPor=''; c.atendidoFecha=''; c.atendidoObs='';
-    persist(); renderList(); showToast('Circular marcada como Pendiente','info');
+    renderList();
+    setSyncStatus('saving','Guardando…');
+    try{ await apiPost({action:'circ_setStatus',id,estatus:'Pendiente',atendidoPor:'',atendidoFecha:'',atendidoObs:''}); setSyncStatus('ok','Guardado ✓'); showToast('Marcada como Pendiente','info'); }
+    catch(e){ setSyncStatus('error',e.message); }
   } else if(c.estatus==='En proceso'){
-    // Ask who attended
     openAten(id);
   } else {
-    c.estatus = 'En proceso';
-    persist(); renderList(); showToast('Circular en proceso','info');
+    c.estatus='En proceso';
+    renderList();
+    setSyncStatus('saving','Guardando…');
+    try{ await apiPost({action:'circ_setStatus',id,estatus:'En proceso'}); setSyncStatus('ok','Guardado ✓'); showToast('Circular en proceso','info'); }
+    catch(e){ setSyncStatus('error',e.message); }
   }
 }
 
@@ -529,14 +576,12 @@ function setFilter(f, btn){
 
 // ── MODAL NEW/EDIT ────────────────────────────────────────
 function openModal(){
-  editingId = null;
-  fileDataUrl = null; fileNameStr = null;
+  editingId = null; fileDataUrl = null; fileNameStr = null;
   document.getElementById('modalTitle').textContent = 'Nueva Circular';
   clearForm();
   document.getElementById('f-emision').value = todayStr();
   document.getElementById('modalOverlay').classList.add('open');
 }
-
 function openEdit(id){
   const c = CIRCULARES.find(x=>x.id===id);
   if(!c) return;
@@ -551,20 +596,12 @@ function openEdit(id){
   document.getElementById('f-limite').value = c.limite||'';
   document.getElementById('f-responsable').value = c.responsable||'';
   document.getElementById('uzName').textContent = c.fileName||'';
-  // rebuild links
-  const lr = document.getElementById('linkRows');
-  lr.innerHTML = '';
-  (c.links||[{tipo:'🎥 Conferencia',url:''}]).forEach(l => addLinkRow(l.tipo, l.url));
+  const lr = document.getElementById('linkRows'); lr.innerHTML='';
+  (c.links||[{tipo:'🎥 Conferencia',url:''}]).forEach(l=>addLinkRow(l.tipo,l.url));
   document.getElementById('modalOverlay').classList.add('open');
 }
-
-function closeModal(){
-  document.getElementById('modalOverlay').classList.remove('open');
-}
-function closeOnBg(e){
-  if(e.target===document.getElementById('modalOverlay')) closeModal();
-}
-
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
+function closeOnBg(e){ if(e.target===document.getElementById('modalOverlay')) closeModal(); }
 function clearForm(){
   ['f-num','f-area','f-titulo','f-desc','f-emision','f-limite','f-responsable'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
@@ -574,85 +611,77 @@ function clearForm(){
   addLinkRow('🎥 Conferencia','');
 }
 
-function guardarCircular(){
+async function guardarCircular(){
   const titulo = document.getElementById('f-titulo').value.trim();
   if(!titulo){ alert('El título es obligatorio.'); return; }
-
-  const links = [...document.querySelectorAll('#linkRows .link-row')].map(row=>({
-    tipo: row.querySelector('select').value,
-    url:  row.querySelector('input').value.trim()
+  const links=[...document.querySelectorAll('#linkRows .link-row')].map(row=>({
+    tipo:row.querySelector('select').value, url:row.querySelector('input').value.trim()
   })).filter(l=>l.url);
-
-  const data = {
-    num:         document.getElementById('f-num').value.trim(),
-    area:        document.getElementById('f-area').value,
+  const circular={
+    id: editingId||uid(),
+    num: document.getElementById('f-num').value.trim(),
+    area: document.getElementById('f-area').value,
     titulo,
-    desc:        document.getElementById('f-desc').value.trim(),
-    emision:     document.getElementById('f-emision').value,
-    limite:      document.getElementById('f-limite').value,
+    desc: document.getElementById('f-desc').value.trim(),
+    emision: document.getElementById('f-emision').value,
+    limite: document.getElementById('f-limite').value,
     responsable: document.getElementById('f-responsable').value.trim(),
-    links,
-    fileData:    fileDataUrl,
-    fileName:    fileNameStr,
+    links, fileName:fileNameStr||'', fileData:fileDataUrl||'',
+    estatus: editingId?(CIRCULARES.find(x=>x.id===editingId)||{}).estatus||'Pendiente':'Pendiente',
+    atendidoPor:'', atendidoFecha:'', atendidoObs:''
   };
-
-  if(editingId){
-    const idx = CIRCULARES.findIndex(x=>x.id===editingId);
-    CIRCULARES[idx] = { ...CIRCULARES[idx], ...data };
-  } else {
-    CIRCULARES.push({ id: uid(), estatus:'Pendiente', atendidoPor:'', atendidoFecha:'', atendidoObs:'', ...data });
-  }
-
-  persist(); closeModal(); renderList();
-  showToast(editingId ? 'Circular actualizada' : 'Circular guardada','ok');
-  editingId = null;
+  if(editingId){ const idx=CIRCULARES.findIndex(x=>x.id===editingId); if(idx>-1) CIRCULARES[idx]={...CIRCULARES[idx],...circular}; }
+  else{ CIRCULARES.push(circular); }
+  closeModal(); renderList();
+  setSyncStatus('saving','Guardando en Sheets…');
+  try{ await apiPost({action:'circ_save',circular}); setSyncStatus('ok','Guardado ✓'); showToast(editingId?'Actualizada':'Circular guardada','ok'); }
+  catch(e){ setSyncStatus('error',e.message); showToast('⚠ Error al guardar','info'); }
+  editingId=null;
 }
 
 // ── DELETE ────────────────────────────────────────────────
 function deleteCirc(id){
-  const c = CIRCULARES.find(x=>x.id===id);
-  if(!c) return;
-  document.getElementById('confirmTitle').textContent = c.titulo || 'Sin título';
-  document.getElementById('confirmNum').textContent = c.num ? `Circular ${c.num}` : '';
+  const c=CIRCULARES.find(x=>x.id===id); if(!c) return;
+  document.getElementById('confirmTitle').textContent=c.titulo||'Sin título';
+  document.getElementById('confirmNum').textContent=c.num?`Circular ${c.num}`:'';
   document.getElementById('confirmOverlay').classList.add('open');
-  document.getElementById('confirmOverlay').dataset.deleteId = id;
+  document.getElementById('confirmOverlay').dataset.deleteId=id;
 }
-function confirmDelete(){
-  const id = document.getElementById('confirmOverlay').dataset.deleteId;
-  CIRCULARES = CIRCULARES.filter(x=>x.id!==id);
-  persist(); renderList();
-  closeConfirm();
-  showToast('Circular eliminada','info');
+async function confirmDelete(){
+  const id=document.getElementById('confirmOverlay').dataset.deleteId;
+  CIRCULARES=CIRCULARES.filter(x=>x.id!==id);
+  renderList(); closeConfirm();
+  setSyncStatus('saving','Eliminando…');
+  try{ await apiPost({action:'circ_delete',id}); setSyncStatus('ok','Eliminado ✓'); showToast('Circular eliminada','info'); }
+  catch(e){ setSyncStatus('error',e.message); }
 }
-function closeConfirm(){
-  document.getElementById('confirmOverlay').classList.remove('open');
-}
+function closeConfirm(){ document.getElementById('confirmOverlay').classList.remove('open'); }
 
 // ── ATENDER MODAL ─────────────────────────────────────────
 function openAten(id){
-  atenId = id;
-  const c = CIRCULARES.find(x=>x.id===id);
-  document.getElementById('atenLabel').textContent = `"${c.titulo}" — ¿quién la atendió?`;
-  document.getElementById('a-quien').value = '';
-  document.getElementById('a-fecha').value = todayStr();
-  document.getElementById('a-obs').value = '';
+  atenId=id;
+  const c=CIRCULARES.find(x=>x.id===id);
+  document.getElementById('atenLabel').textContent=`"${c.titulo}" — ¿quién la atendió?`;
+  document.getElementById('a-quien').value='';
+  document.getElementById('a-fecha').value=todayStr();
+  document.getElementById('a-obs').value='';
   document.getElementById('atenOverlay').classList.add('open');
 }
 function closeAten(){ document.getElementById('atenOverlay').classList.remove('open'); }
 function closeAtenOnBg(e){ if(e.target===document.getElementById('atenOverlay')) closeAten(); }
-function confirmarAten(){
-  const quien = document.getElementById('a-quien').value.trim();
+async function confirmarAten(){
+  const quien=document.getElementById('a-quien').value.trim();
   if(!quien){ alert('Escribe quién atendió la circular.'); return; }
-  const c = CIRCULARES.find(x=>x.id===atenId);
-  c.estatus = 'Atendida';
-  c.atendidoPor   = quien;
-  c.atendidoFecha = document.getElementById('a-fecha').value;
-  c.atendidoObs   = document.getElementById('a-obs').value.trim();
-  persist(); closeAten(); renderList();
-  showToast('Circular marcada como atendida ✓','ok');
+  const c=CIRCULARES.find(x=>x.id===atenId);
+  c.estatus='Atendida'; c.atendidoPor=quien;
+  c.atendidoFecha=document.getElementById('a-fecha').value;
+  c.atendidoObs=document.getElementById('a-obs').value.trim();
+  closeAten(); renderList();
+  setSyncStatus('saving','Guardando…');
+  try{ await apiPost({action:'circ_setStatus',id:atenId,estatus:'Atendida',atendidoPor:c.atendidoPor,atendidoFecha:c.atendidoFecha,atendidoObs:c.atendidoObs}); setSyncStatus('ok','Guardado ✓'); showToast('Circular atendida ✓','ok'); }
+  catch(e){ setSyncStatus('error',e.message); }
 }
 
-// ── LINKS ─────────────────────────────────────────────────
 function addLink(){ addLinkRow('🎥 Conferencia',''); }
 function addLinkRow(tipo, url){
   const row = document.createElement('div');
@@ -714,7 +743,8 @@ function showToast(msg, type){
 }
 
 // ── INIT ──────────────────────────────────────────────────
-renderList();
+loadFromSheets();
 </script>
 </body>
 </html>
+
