@@ -325,6 +325,75 @@ header{
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+/* ── MOBILE RESPONSIVE ── */
+@media(max-width:768px){
+  header{padding:12px 16px;gap:10px;}
+  .htx h1{font-size:15px;}
+  .htx p{display:none;}
+  .hbadge{padding:5px 10px;}
+  .hbadge b{font-size:12px;}
+
+  .toolbar{padding:8px 12px;gap:6px;}
+  .tlbl{display:none;}
+  .tsep{display:none;}
+  .tbtn{padding:4px 10px;font-size:10px;}
+  .tsel{font-size:10px;padding:4px 22px 4px 10px;}
+
+  .stats{flex-wrap:wrap;}
+  .stat{flex:1 1 calc(50% - 1px);min-width:0;padding:8px 12px;}
+  .sn{font-size:15px;}
+
+  /* Stack layout: list on top, gantt below */
+  .gantt-wrap{flex-direction:column;overflow:visible;}
+
+  /* Left panel: full width, no fixed height */
+  .g-left{
+    width:100% !important;
+    border-right:none;
+    border-bottom:2px solid var(--accent);
+    overflow:visible;
+  }
+  .g-left-inner{overflow:visible;}
+
+  /* Hide ámbito column on mobile */
+  .lh{grid-template-columns:80px 1fr 110px;}
+  .l-prog-hdr{grid-template-columns:80px 1fr 110px;}
+  .l-row{grid-template-columns:80px 1fr 110px;}
+  .lh-cell:last-child,.l-cell:last-child{display:none;}
+
+  .l-cell{font-size:10px;padding:5px 7px;}
+  .lc-prog{font-size:8px;}
+  .lc-resp input{font-size:9px;}
+
+  /* Right panel: full width, scroll horizontally */
+  .g-right{
+    width:100%;
+    overflow-x:auto;
+    overflow-y:visible;
+    border-top:none;
+  }
+  .g-right-inner{overflow-x:auto;}
+
+  /* Gantt rows match left rows heights automatically */
+  .r-row{min-height:var(--row-h);}
+
+  /* Detail panel full screen on mobile */
+  .dpanel{width:100% !important;right:-100% !important;}
+  .dpanel.open{right:0 !important;}
+}
+
+@media(max-width:480px){
+  /* Even narrower: hide responsable column too */
+  .lh{grid-template-columns:70px 1fr;}
+  .l-prog-hdr{grid-template-columns:70px 1fr;}
+  .l-row{grid-template-columns:70px 1fr;}
+  .lh-cell:nth-child(3),.lh-cell:nth-child(4),
+  .l-cell:nth-child(3),.l-cell:nth-child(4){display:none;}
+
+  .tbtn{font-size:9px;padding:3px 8px;}
+  .hbadge{display:none;}
+}
 </style>
 </head>
 <body>
@@ -405,19 +474,27 @@ const TOTAL_DIAS=_a;
 
 function dayAbs(mes,dia){if(!mes||!dia) return 0; return DIAS_ACUM[mes]+dia;}
 
-// Build a Set of active absolute days from activeDays array or mesIni/dIni/mesFin/dFin range
+// Build a Set of active absolute days - always returns a real Set
 function buildDaysSet(itm){
+  // Already a real Set
+  if(itm.days instanceof Set) return itm.days;
   const s=new Set();
-  // Restore from individually saved days if available
-  if(itm.activeDays && itm.activeDays.length){
-    itm.activeDays.forEach(d=>s.add(d));
+  // Restore from individually toggled days array if available
+  if(itm.activeDays && Array.isArray(itm.activeDays) && itm.activeDays.length){
+    itm.activeDays.forEach(d=>s.add(Number(d)));
     return s;
   }
+  // Fall back to range
   if(!itm.mesIni||!itm.dIni) return s;
   const ini=DIAS_ACUM[itm.mesIni]+itm.dIni;
   const fin=DIAS_ACUM[itm.mesFin]+itm.dFin;
   for(let d=ini;d<=fin;d++) s.add(d);
   return s;
+}
+
+// Always ensure item.days is a real Set before use
+function ensureDays(itm){
+  itm.days = buildDaysSet(itm);
 }
 
 // Sync mesIni/dIni/mesFin/dFin back from a days Set (for save/load compat)
@@ -524,6 +601,8 @@ function syncScroll(){
 
 // ── BUILD ─────────────────────────────────────────────────────
 function build(){
+  // Always ensure every item has a proper Set (safe after localStorage reload)
+  DATA.forEach(itm=>ensureDays(itm));
   buildHeaders();
   buildRows();
   buildStats();
@@ -711,7 +790,7 @@ function buildRightRow(container, item, cfg){
             const itm=DATA.find(x=>x.id===_id);
             if(!itm) return;
             // Use a Set of active absolute days
-            if(!itm.days) itm.days=buildDaysSet(itm);
+            ensureDays(itm);
             if(itm.days.has(_dAbs)){
               itm.days.delete(_dAbs);
             } else {
@@ -723,7 +802,7 @@ function buildRightRow(container, item, cfg){
           };
         })();
 
-        if(!item.days) item.days=buildDaysSet(item);
+        ensureDays(item);
         if(ini>0 && item.days.has(dAbs)){
           const bar=document.createElement('div');
           const prevActive=item.days.has(dAbs-1);
@@ -856,8 +935,9 @@ function exportData(){
   const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='gantt_sems_2026.json';a.click();
 }
 
-// Sync vertical scroll between left and right panels
+// Sync vertical scroll between left and right panels (desktop only)
 window.addEventListener('DOMContentLoaded',()=>{
+  if(window.innerWidth<=768) return;
   const lb=document.getElementById('leftBody');
   const rb=document.getElementById('rightBody');
   if(lb&&rb){
@@ -868,9 +948,19 @@ window.addEventListener('DOMContentLoaded',()=>{
   }
 });
 
-// Make gantt fill window height
+// Make gantt fill window height (desktop only)
 function setHeight(){
   const wrap=document.getElementById('ganttWrap');
+  if(window.innerWidth<=768){
+    // Mobile: auto height, stacked layout
+    wrap.style.height='auto';
+    wrap.style.overflowY='visible';
+    document.getElementById('gLeft').style.height='auto';
+    document.getElementById('gLeft').style.overflowY='visible';
+    document.getElementById('gRight').style.height='auto';
+    document.getElementById('gRight').style.overflowY='visible';
+    return;
+  }
   const top=wrap.getBoundingClientRect().top;
   wrap.style.height=(window.innerHeight-top)+'px';
   wrap.style.overflowY='auto';
@@ -882,6 +972,8 @@ function setHeight(){
 window.addEventListener('resize',setHeight);
 setTimeout(setHeight,50);
 
+// Init all items with proper Set before first render
+DATA.forEach(itm=>ensureDays(itm));
 build();
 </script>
 </body>
