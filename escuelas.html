@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escuelas por la Tierra — CBTis 179</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F0EDE7; --surface:#FAF8F5; --card:#FFFFFF;
+  --border:#E0DBD3; --border2:#CEC9C0;
+  --text:#1A1714; --muted:#8C8479; --lite:#C0BAB0;
+  --guinda:#6B2D52; --guinda-d:#4A1E39; --oro:#B8872A;
+  --green:#1A5C2E; --green-d:#0F3D1E; --green-l:#E8F5EC;
+  --green-mid:#27AE60; --green-lite:#86EFAC;
+  --yellow:#854D0E; --yellow-l:#FEF9C3;
+  --red:#991B1B; --red-l:#FEE2E2;
+  --blue:#1A4F7A; --blue-l:#EAF2FA;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* HEADER */
+.site-header{background:var(--green-d);position:relative;overflow:hidden;}
+.site-header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(60deg,transparent,transparent 20px,rgba(255,255,255,.02) 20px,rgba(255,255,255,.02) 21px);}
+.site-header::after{content:'';position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;background:rgba(39,174,96,.12);}
+.header-inner{position:relative;z-index:1;padding:20px 32px;display:flex;align-items:center;gap:16px;}
+.header-icon{width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.header-text h1{font-family:'Playfair Display',serif;font-size:20px;color:#fff;line-height:1.2;}
+.header-text p{font-size:11px;color:rgba(255,255,255,.5);margin-top:2px;font-weight:300;}
+.header-badge{margin-left:auto;text-align:right;flex-shrink:0;}
+.header-badge b{display:block;font-size:13px;color:#fff;font-weight:700;}
+.header-badge span{font-size:10px;color:rgba(255,255,255,.5);}
+.header-back{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:7px 14px;font-size:11px;font-weight:600;color:#fff;text-decoration:none;transition:background .15s;white-space:nowrap;}
+.header-back:hover{background:rgba(255,255,255,.2);}
+
+/* NAV */
+.site-nav{background:var(--green-d);border-bottom:2px solid var(--green-mid);display:flex;padding:0 32px;overflow-x:auto;}
+.site-nav a{padding:10px 18px;font-size:10px;font-weight:600;color:rgba(255,255,255,.45);text-decoration:none;text-transform:uppercase;letter-spacing:.08em;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;white-space:nowrap;}
+.site-nav a:hover{color:rgba(255,255,255,.8);}
+.site-nav a.active{color:#fff;border-bottom-color:var(--green-mid);}
+
+/* MISION HERO */
+.mision-hero{background:linear-gradient(135deg,var(--green-d) 0%,var(--green) 100%);padding:28px 32px;display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.mision-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:18px 20px;}
+.mision-card .mc-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.5);margin-bottom:8px;}
+.mision-card .mc-text{font-size:12px;color:rgba(255,255,255,.85);line-height:1.6;font-weight:300;}
+
+/* STATS BAR */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border-bottom:1px solid var(--border);}
+.stat-cell{padding:12px 20px;border-right:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.stat-cell:last-child{border-right:none;}
+.stat-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.stat-num{font-family:'Playfair Display',serif;font-size:22px;line-height:1;}
+.stat-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:1px;}
+
+/* MAIN */
+.main{padding:28px 32px;max-width:1080px;margin:0 auto;}
+.section-title{font-family:'Playfair Display',serif;font-size:18px;color:var(--green);margin-bottom:4px;}
+.section-sub{font-size:11px;color:var(--muted);margin-bottom:20px;font-weight:300;}
+
+/* DIMENSION GROUPS */
+.dim-group{margin-bottom:32px;}
+.dim-label{display:inline-flex;align-items:center;gap:8px;background:var(--green);color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:5px 14px;border-radius:20px;margin-bottom:14px;}
+
+/* INDICATOR CARDS */
+.ind-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;}
+.ind-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04);transition:box-shadow .2s,transform .15s;}
+.ind-card:hover{box-shadow:0 6px 24px rgba(0,0,0,.1);transform:translateY(-2px);}
+.ind-strip{height:4px;}
+.ind-top{padding:14px 16px 10px;display:flex;align-items:flex-start;gap:12px;}
+.ind-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.ind-info{flex:1;min-width:0;}
+.ind-subdir{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green);margin-bottom:3px;}
+.ind-indicador{font-size:12px;font-weight:600;line-height:1.4;color:var(--text);margin-bottom:6px;}
+.ind-meta{font-size:11px;color:var(--muted);line-height:1.5;padding:0 16px 10px;}
+.ind-divider{border:none;border-top:1px solid var(--border);margin:0 16px;}
+.ind-bottom{padding:10px 16px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ind-field{display:flex;flex-direction:column;gap:2px;}
+.ind-field-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--lite);}
+.ind-field-val{font-size:11px;color:var(--text);line-height:1.4;}
+.ind-fecha{display:flex;align-items:center;gap:6px;grid-column:1/-1;background:var(--green-l);border:1px solid #BBF7D0;border-radius:8px;padding:6px 10px;font-size:11px;color:var(--green);font-weight:600;}
+.ind-fecha.vencida{background:var(--red-l);border-color:#FECACA;color:var(--red);}
+.ind-fecha.proxima{background:var(--yellow-l);border-color:#FDE68A;color:var(--yellow);}
+
+/* STATUS BADGE */
+.status-wrap{padding:0 16px 14px;}
+.status-btn{width:100%;border-radius:8px;padding:7px 12px;font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;cursor:pointer;border:1px solid;transition:all .15s;}
+.s-pendiente{background:#EDEBE4;color:var(--muted);border-color:var(--border);}
+.s-pendiente:hover{background:#E3E0D9;}
+.s-proceso{background:var(--yellow-l);color:var(--yellow);border-color:#FDE68A;}
+.s-proceso:hover{background:#FEF08A;}
+.s-completado{background:var(--green-l);color:var(--green);border-color:#86EFAC;}
+.s-completado:hover{background:#BBF7D0;}
+
+/* PRESUPUESTO */
+.presupuesto-section{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:28px;}
+.pres-header{background:var(--green);padding:14px 20px;display:flex;align-items:center;gap:10px;}
+.pres-header h3{font-family:'Playfair Display',serif;font-size:16px;color:#fff;}
+.pres-total{margin-left:auto;font-size:13px;color:rgba(255,255,255,.8);font-weight:600;}
+.pres-table{width:100%;border-collapse:collapse;}
+.pres-table th{background:var(--green-l);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--green);padding:8px 20px;text-align:left;border-bottom:1px solid var(--border);}
+.pres-table th:last-child{text-align:right;}
+.pres-table td{padding:10px 20px;font-size:12px;border-bottom:1px solid var(--border);color:var(--text);}
+.pres-table tr:last-child td{border-bottom:none;}
+.pres-table td:last-child{text-align:right;font-weight:700;color:var(--green);font-family:'Playfair Display',serif;font-size:14px;}
+.pres-table tr:hover td{background:var(--green-l);}
+
+/* FIRMAS */
+.firmas-section{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 24px;display:flex;gap:40px;flex-wrap:wrap;margin-bottom:28px;}
+.firma-item{flex:1;min-width:200px;}
+.firma-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--lite);margin-bottom:6px;}
+.firma-name{font-size:14px;font-weight:700;color:var(--text);}
+.firma-role{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* SYNC BAR */
+.sync-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:7px 32px;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--lite);flex-shrink:0;transition:background .3s;}
+.sync-dot.ok{background:var(--green-mid);}
+.sync-dot.saving{background:var(--oro);animation:pulse .8s infinite;}
+.sync-dot.error{background:var(--red);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;padding:10px 18px;border-radius:10px;font-size:12px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.15);opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;z-index:999;background:var(--green);color:#fff;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* FOOTER */
+.site-footer{background:var(--green-d);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-top:20px;}
+.site-footer span{font-size:10px;color:rgba(255,255,255,.35);}
+.site-footer strong{color:rgba(255,255,255,.6);}
+
+@media(max-width:700px){
+  .header-inner{padding:14px 16px;flex-wrap:wrap;gap:10px;}
+  .mision-hero{grid-template-columns:1fr;padding:16px;}
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+  .main{padding:16px;}
+  .ind-bottom{grid-template-columns:1fr;}
+  .firmas-section{flex-direction:column;gap:16px;}
+  .site-nav{padding:0 16px;}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-icon">🌱</div>
+    <div class="header-text">
+      <h1>Escuelas por la Tierra</h1>
+      <p>Plan de Gestión Ambiental Escolar · CBTis 179 · Ciclo 2025–2026</p>
+    </div>
+    <div class="header-badge">
+      <b>7 indicadores</b>
+      <span>Fundación EDUCA México</span>
+    </div>
+    <a href="index.html" class="header-back">← Inicio</a>
+  </div>
+</header>
+
+<nav class="site-nav">
+  <a href="index.html">Inicio</a>
+  <a href="gantt_sems.html">Programas Institucionales</a>
+  <a href="supervision.html">Supervisión</a>
+  <a href="circulares.html">Circulares</a>
+  <a href="escuelas.html" class="active">Escuelas por la Tierra</a>
+</nav>
+
+<div class="sync-bar">
+  <div class="sync-dot" id="syncDot"></div>
+  <span id="syncMsg">Conectando con Google Sheets…</span>
+  <button onclick="loadFromSheets()" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:6px;padding:3px 12px;font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Outfit',sans-serif">🔄 Actualizar</button>
+</div>
+
+<!-- Misión y Visión -->
+<div class="mision-hero">
+  <div class="mision-card">
+    <div class="mc-label">🎯 Misión</div>
+    <div class="mc-text">Formar estudiantes responsables y comprometidos con el cuidado del ambiente mediante acciones educativas, uso sostenible de recursos y participación activa en proyectos ambientales escolares.</div>
+  </div>
+  <div class="mision-card">
+    <div class="mc-label">🔭 Visión</div>
+    <div class="mc-text">Ser una institución referente en gestión ambiental escolar, con comunidad educativa consciente, participativa y capaz de liderar iniciativas sostenibles que impacten positivamente en su entorno.</div>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-bar">
+  <div class="stat-cell"><div class="stat-dot" style="background:var(--green)"></div><div><div class="stat-num" id="st-total">7</div><div class="stat-lbl">Indicadores</div></div></div>
+  <div class="stat-cell"><div class="stat-dot" style="background:var(--muted)"></div><div><div class="stat-num" id="st-pend">0</div><div class="stat-lbl">Pendientes</div></div></div>
+  <div class="stat-cell"><div class="stat-dot" style="background:var(--yellow)"></div><div><div class="stat-num" id="st-proc">0</div><div class="stat-lbl">En proceso</div></div></div>
+  <div class="stat-cell"><div class="stat-dot" style="background:var(--green-mid)"></div><div><div class="stat-num" id="st-comp">0</div><div class="stat-lbl">Completados</div></div></div>
+</div>
+
+<div class="main">
+
+  <div class="section-title">Indicadores del Plan</div>
+  <div class="section-sub">Responsable del Plan: Luis Eduardo Ibarra Hernández · Director: Mtro. Alberto Velázquez Ortega</div>
+
+  <!-- DIMENSIÓN: AGENDA AMBIENTAL -->
+  <div class="dim-group">
+    <div class="dim-label">🗓 Agenda Ambiental</div>
+    <div class="ind-grid">
+
+      <!-- 1: Planeación -->
+      <div class="ind-card" id="card-0">
+        <div class="ind-strip" style="background:var(--green-mid)"></div>
+        <div class="ind-top">
+          <div class="ind-icon" style="background:var(--green-l)">📋</div>
+          <div class="ind-info">
+            <div class="ind-subdir">Planeación de Gestión Ambiental</div>
+            <div class="ind-indicador">Incorporar objetivos ambientales en plan institucional anual</div>
+          </div>
+        </div>
+        <div class="ind-meta"><strong>Meta:</strong> Incorporar objetivos y acciones ambientales en el Plan Anual 2025–2026 con metas medibles.<br><strong>Acción:</strong> Integrar apartado ambiental en POA y plan de mejora institucional.</div>
+        <hr class="ind-divider">
+        <div class="ind-bottom">
+          <div class="ind-field"><div class="ind-field-lbl">Responsables</div><div class="ind-field-val">Director, Subdirector Académico, Comité Ambiental</div></div>
+          <div class="ind-field"><div class="ind-field-lbl">Monitoreo</div><div class="ind-field-val">POA firmado, acta de sesión y lista de metas aprobadas</div></div>
+          <div class="ind-fecha" id="fecha-0">📅 Fecha límite: 27 Oct 2026</div>
+        </div>
+        <div class="obs-wrap" style="padding:0 16px 12px;">
+          <textarea id="obs-0" placeholder="Observaciones / evidencias…" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'Outfit',sans-serif;font-size:11px;color:var(--text);background:var(--bg);outline:none;resize:vertical;min-height:56px;line-height:1.5;" oninput="autoSaveObs(0)">{}</textarea>
+          <div style="text-align:right;margin-top:4px;">
+            <span id="obs-saved-0" style="font-size:10px;color:var(--green);font-weight:600;opacity:0;transition:opacity .3s">✓ Guardado</span>
+          </div>
+        </div>
+        <div class="status-wrap"><button class="status-btn s-pendiente" id="sbtn-0" onclick="cycleStatus(0)">Pendiente</button></div>
+      </div>
+
+      <!-- 2: Comité -->
+      <div class="ind-card" id="card-1">
+        <div class="ind-strip" style="background:var(--green-mid)"></div>
+        <div class="ind-top">
+          <div class="ind-icon" style="background:var(--green-l)">👥</div>
+          <div class="ind-info">
+            <div class="ind-subdir">Comité de Gestión Ambiental</div>
+            <div class="ind-indicador">Integrar comité con representación de todos los sectores</div>
+          </div>
+        </div>
+        <div class="ind-meta"><strong>Meta:</strong> Integrar un Comité Ambiental con representantes de directivos, docentes, alumnos y administrativos.<br><strong>Acción:</strong> Emitir convocatoria formal y designar un representante por cada sector.</div>
+        <hr class="ind-divider">
+        <div class="ind-bottom">
+          <div class="ind-field"><div class="ind-field-lbl">Responsables</div><div class="ind-field-val">Dirección y Comité de Gestión Ambiental Escolar</div></div>
+          <div class="ind-field"><div class="ind-field-lbl">Monitoreo</div><div class="ind-field-val">Acta de integración firmada y lista oficial de integrantes</div></div>
+          <div class="ind-fecha" id="fecha-1">📅 Fecha límite: 27 Feb 2026</div>
+        </div>
+        <div class="obs-wrap" style="padding:0 16px 12px;">
+          <textarea id="obs-1" placeholder="Observaciones / evidencias…" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'Outfit',sans-serif;font-size:11px;color:var(--text);background:var(--bg);outline:none;resize:vertical;min-height:56px;line-height:1.5;" oninput="autoSaveObs(1)">{}</textarea>
+          <div style="text-align:right;margin-top:4px;">
+            <span id="obs-saved-1" style="font-size:10px;color:var(--green);font-weight:600;opacity:0;transition:opacity .3s">✓ Guardado</span>
+          </div>
+        </div>
+        <div class="status-wrap"><button class="status-btn s-pendiente" id="sbtn-1" onclick="cycleStatus(1)">Pendiente</button></div>
+      </div>
+
+      <!-- 3: Política -->
+      <div class="ind-card" id="card-2">
+        <div class="ind-strip" style="background:var(--green-mid)"></div>
+        <div class="ind-top">
+          <div class="ind-icon" style="background:var(--green-l)">📢</div>
+          <div class="ind-info">
+            <div class="ind-subdir">Política de Gestión Ambiental</div>
+            <div class="ind-indicador">Comunidad conoce las políticas de gestión ambiental</div>
+          </div>
+        </div>
+        <div class="ind-meta"><strong>Meta:</strong> Difundir las políticas ambientales y lograr que al menos el 80% de la comunidad las conozca.<br><strong>Acción:</strong> Socializar en reuniones, carteles informativos y medios digitales institucionales.</div>
+        <hr class="ind-divider">
+        <div class="ind-bottom">
+          <div class="ind-field"><div class="ind-field-lbl">Responsables</div><div class="ind-field-val">Dirección y Comité de Gestión Ambiental</div></div>
+          <div class="ind-field"><div class="ind-field-lbl">Monitoreo</div><div class="ind-field-val">Encuesta de conocimiento y evidencias de difusión</div></div>
+          <div class="ind-fecha" id="fecha-2">📅 Fecha límite: 02 May 2026</div>
+        </div>
+        <div class="obs-wrap" style="padding:0 16px 12px;">
+          <textarea id="obs-2" placeholder="Observaciones / evidencias…" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'Outfit',sans-serif;font-size:11px;color:var(--text);background:var(--bg);outline:none;resize:vertical;min-height:56px;line-height:1.5;" oninput="autoSaveObs(2)">{}</textarea>
+          <div style="text-align:right;margin-top:4px;">
+            <span id="obs-saved-2" style="font-size:10px;color:var(--green);font-weight:600;opacity:0;transition:opacity .3s">✓ Guardado</span>
+          </div>
+        </div>
+        <div class="status-wrap"><button class="status-btn s-pendiente" id="sbtn-2" onclick="cycleStatus(2)">Pendiente</button></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DIMENSIÓN: ESTRATEGIAS -->
+  <div class="dim-group">
+    <div class="dim-label">🌿 Estrategias para la Gestión Ambiental</div>
+    <div class="ind-grid">
+
+      <!-- 5: Huerto -->
+      <div class="ind-card" id="card-3">
+        <div class="ind-strip" style="background:#27AE60"></div>
+        <div class="ind-top">
+          <div class="ind-icon" style="background:#E8F5EC">🌱</div>
+          <div class="ind-info">
+            <div class="ind-subdir">Huerto Escolar</div>
+            <div class="ind-indicador">Huerto como estrategia didáctica interdisciplinar</div>
+          </div>
+        </div>
+        <div class="ind-meta"><strong>Meta:</strong> Integrar el huerto escolar en al menos 3 asignaturas durante el ciclo 2025–2026.<br><strong>Acción:</strong> Diseñar actividades didácticas vinculadas al huerto en diferentes campos formativos.</div>
+        <hr class="ind-divider">
+        <div class="ind-bottom">
+          <div class="ind-field"><div class="ind-field-lbl">Responsables</div><div class="ind-field-val">Docentes participantes y Comité Ambiental</div></div>
+          <div class="ind-field"><div class="ind-field-lbl">Monitoreo</div><div class="ind-field-val">Planeaciones registradas y evidencias fotográficas</div></div>
+          <div class="ind-fecha" id="fecha-3">📅 Fecha límite: 15 Jun 2026</div>
+        </div>
+        <div class="obs-wrap" style="padding:0 16px 12px;">
+          <textarea id="obs-3" placeholder="Observaciones / evidencias…" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'Outfit',sans-serif;font-size:11px;color:var(--text);background:var(--bg);outline:none;resize:vertical;min-height:56px;line-height:1.5;" oninput="autoSaveObs(3)">{}</textarea>
+          <div style="text-align:right;margin-top:4px;">
+            <span id="obs-saved-3" style="font-size:10px;color:var(--green);font-weight:600;opacity:0;transition:opacity .3s">✓ Guardado</span>
+          </div>
+        </div>
+        <div class="status-wrap"><button class="status-btn s-pendiente" id="sbtn-3" onclick="cycleStatus(3)">Pendiente</button></div>
+      </div>
+
+      <!-- 6: Áreas verdes -->
+      <div class="ind-card" id="card-4">
+        <div class="ind-strip" style="background:#27AE60"></div>
+        <div class="ind-top">
+          <div class="ind-icon" style="background:#E8F5EC">🌳</div>
+          <div class="ind-info">
+            <div class="ind-subdir">Áreas Verdes — Manejo Sostenible</div>
+            <div class="ind-indicador">Manejo eficiente y sostenible permanente de áreas verdes</div>
+          </div>
+        </div>
+        <div class="ind-meta"><strong>Meta:</strong> Mantener el 80% de áreas verdes con programa permanente de cuidado y mantenimiento sostenible.<br><strong>Acción:</strong> Implementar calendario mensual de riego, poda y uso responsable de agua.</div>
+        <hr class="ind-divider">
+        <div class="ind-bottom">
+          <div class="ind-field"><div class="ind-field-lbl">Responsables</div><div class="ind-field-val">Comité Ambiental y personal de mantenimiento</div></div>
+          <div class="ind-field"><div class="ind-field-lbl">Monitoreo</div><div class="ind-field-val">Bitácora mensual y evidencias fotográficas</div></div>
+          <div class="ind-fecha" id="fecha-4">📅 Fecha límite: 06 Mar 2026</div>
+        </div>
+        <div class="obs-wrap" style="padding:0 16px 12px;">
+          <textarea id="obs-4" placeholder="Observaciones / evidencias…" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'Outfit',sans-serif;font-size:11px;color:var(--text);background:var(--bg);outline:none;resize:vertical;min-height:56px;line-height:1.5;" oninput="autoSaveObs(4)">{}</textarea>
+          <div style="text-align:right;margin-top:4px;">
+            <span id="obs-saved-4" style="font-size:10px;color:var(--green);font-weight:600;opacity:0;transition:opacity .3s">✓ Guardado</span>
+          </div>
+        </div>
+        <div class="status-wrap"><button class="status-btn s-pendiente" id="sbtn-4" onclick="cycleStatus(4)">Pendiente</button></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DIMENSIÓN: CAPACIDADES PARA LA SOSTENIBILIDAD -->
+  <div class="dim-group">
+    <div class="dim-label">🎓 Capacidades para la Sostenibilidad</div>
+    <div class="ind-grid">
+
+      <!-- 7: Docentes -->
+      <div class="ind-card" id="card-5">
+        <div class="ind-strip" style="background:var(--guinda)"></div>
+        <div class="ind-top">
+          <div class="ind-icon" style="background:#F3EBF0">👩‍🏫</div>
+          <div class="ind-info">
+            <div class="ind-subdir">Docentes</div>
+            <div class="ind-indicador">Docentes integran contenidos ambientales en sus prácticas</div>
+          </div>
+        </div>
+        <div class="ind-meta"><strong>Meta:</strong> Lograr que el 20% del personal docente integre contenidos ambientales en sus planeaciones.<br><strong>Acción:</strong> Impartir capacitación y solicitar evidencia de actividades ambientales implementadas en clase.</div>
+        <hr class="ind-divider">
+        <div class="ind-bottom">
+          <div class="ind-field"><div class="ind-field-lbl">Responsables</div><div class="ind-field-val">Subdirección académica y Comité Ambiental</div></div>
+          <div class="ind-field"><div class="ind-field-lbl">Monitoreo</div><div class="ind-field-val">Revisión semestral de planeaciones y reporte de evidencias</div></div>
+          <div class="ind-fecha" id="fecha-5">📅 Fecha límite: 15 Jun 2026</div>
+        </div>
+        <div class="obs-wrap" style="padding:0 16px 12px;">
+          <textarea id="obs-5" placeholder="Observaciones / evidencias…" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'Outfit',sans-serif;font-size:11px;color:var(--text);background:var(--bg);outline:none;resize:vertical;min-height:56px;line-height:1.5;" oninput="autoSaveObs(5)">{}</textarea>
+          <div style="text-align:right;margin-top:4px;">
+            <span id="obs-saved-5" style="font-size:10px;color:var(--green);font-weight:600;opacity:0;transition:opacity .3s">✓ Guardado</span>
+          </div>
+        </div>
+        <div class="status-wrap"><button class="status-btn s-pendiente" id="sbtn-5" onclick="cycleStatus(5)">Pendiente</button></div>
+      </div>
+
+      <!-- 8: Estudiantes -->
+      <div class="ind-card" id="card-6">
+        <div class="ind-strip" style="background:var(--oro)"></div>
+        <div class="ind-top">
+          <div class="ind-icon" style="background:#FDF6E7">🧑‍🎓</div>
+          <div class="ind-info">
+            <div class="ind-subdir">Estudiantes</div>
+            <div class="ind-indicador">Alumnos participan activamente en proyectos ambientales</div>
+          </div>
+        </div>
+        <div class="ind-meta"><strong>Meta:</strong> Lograr que al menos el 40% del alumnado participe en proyectos ambientales durante el ciclo.<br><strong>Acción:</strong> Formar brigadas ambientales y desarrollar campañas y proyectos liderados por estudiantes.</div>
+        <hr class="ind-divider">
+        <div class="ind-bottom">
+          <div class="ind-field"><div class="ind-field-lbl">Responsables</div><div class="ind-field-val">Docentes, Comité Ambiental y orientación educativa</div></div>
+          <div class="ind-field"><div class="ind-field-lbl">Monitoreo</div><div class="ind-field-val">Registro de participación, evidencias y reporte semestral</div></div>
+          <div class="ind-fecha" id="fecha-6">📅 Fecha límite: 15 Jun 2026</div>
+        </div>
+        <div class="obs-wrap" style="padding:0 16px 12px;">
+          <textarea id="obs-6" placeholder="Observaciones / evidencias…" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:'Outfit',sans-serif;font-size:11px;color:var(--text);background:var(--bg);outline:none;resize:vertical;min-height:56px;line-height:1.5;" oninput="autoSaveObs(6)">{}</textarea>
+          <div style="text-align:right;margin-top:4px;">
+            <span id="obs-saved-6" style="font-size:10px;color:var(--green);font-weight:600;opacity:0;transition:opacity .3s">✓ Guardado</span>
+          </div>
+        </div>
+        <div class="status-wrap"><button class="status-btn s-pendiente" id="sbtn-6" onclick="cycleStatus(6)">Pendiente</button></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PRESUPUESTO -->
+  <div class="section-title">Presupuesto estimado</div>
+  <div class="section-sub" style="margin-bottom:14px">Desglose de costos de implementación del Plan de Gestión Ambiental</div>
+  <div class="presupuesto-section">
+    <div class="pres-header">
+      <span style="font-size:18px">💰</span>
+      <h3>Desglose de Costos</h3>
+      <div class="pres-total">Total: $18,000 MXN</div>
+    </div>
+    <table class="pres-table">
+      <thead><tr><th>Concepto</th><th>Costo</th></tr></thead>
+      <tbody>
+        <tr><td>Material para mantenimiento de áreas verdes</td><td>$10,000</td></tr>
+        <tr><td>Material para huerto escolar</td><td>$5,000</td></tr>
+        <tr><td>Impresión de carteles y difusión ambiental</td><td>$2,000</td></tr>
+        <tr><td>Material para brigadas estudiantiles</td><td>$1,000</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- FIRMAS -->
+  <div class="firmas-section">
+    <div class="firma-item">
+      <div class="firma-lbl">Responsable del Plan</div>
+      <div class="firma-name">Luis Eduardo Ibarra Hernández</div>
+      <div class="firma-role">Responsable de Gestión Ambiental Escolar</div>
+    </div>
+    <div class="firma-item">
+      <div class="firma-lbl">Director</div>
+      <div class="firma-name">Mtro. Alberto Velázquez Ortega</div>
+      <div class="firma-role">Director · CBTis 179</div>
+    </div>
+    <div class="firma-item">
+      <div class="firma-lbl">Comunicación y difusión</div>
+      <div class="firma-name" style="font-size:12px;font-weight:400;color:var(--muted);line-height:1.5;">Comunicar avances por medios digitales, carteles informativos, reuniones académicas y reportes semestrales con evidencias de impacto ambiental.</div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="toast" id="toast"></div>
+
+<footer class="site-footer">
+  <span>CBTis 179 · Escuelas por la Tierra · Ciclo <strong>2025–2026</strong></span>
+  <span>Fundación EDUCA México A.C. · SEP · DGETI</span>
+</footer>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────
+const TOTAL = 7;
+const S_NEXT = ['En proceso','Completado ✓','Pendiente'];
+const S_CLS  = ['s-pendiente','s-proceso','s-completado'];
+const S_IDX  = {'Pendiente':0,'En proceso':1,'Completado ✓':2};
+
+// ══ CONFIGURACIÓN — pega tu URL de Apps Script aquí ══════════
+const API_URL = 'https://script.google.com/macros/s/AKfycbzpvjhmPhSOjudDlrFNkDQE8xp0rHvRTILe5dryTu5-GoIs8OxFQEroMv4QVXaxPXi3/exec';
+// ═════════════════════════════════════════════════════════════
+
+let STATUSES = Array(TOTAL).fill('Pendiente');
+let OBS      = Array(TOTAL).fill('');
+
+// ── API ───────────────────────────────────────────────────────
+function setSyncStatus(state, msg){
+  const dot=document.getElementById('syncDot');
+  const txt=document.getElementById('syncMsg');
+  if(dot) dot.className='sync-dot '+state;
+  if(txt) txt.textContent=msg;
+}
+async function apiGet(params){
+  const res=await fetch(API_URL+'?'+new URLSearchParams(params));
+  return res.json();
+}
+async function apiPost(body){
+  const res=await fetch(API_URL,{method:'POST',body:JSON.stringify(body)});
+  return res.json();
+}
+
+async function loadFromSheets(){
+  setSyncStatus('saving','Cargando desde Google Sheets…');
+  try{
+    const data=await apiGet({action:'ept_getAll'});
+    if(data.error) throw new Error(data.error);
+    (data.rows||[]).forEach(r=>{
+      const i=parseInt(r.indicador_idx);
+      if(!isNaN(i) && i>=0 && i<TOTAL){
+        STATUSES[i]=r.estatus||'Pendiente';
+        OBS[i]=r.observaciones||'';
+      }
+    });
+    setSyncStatus('ok','Sincronizado ✓');
+  } catch(e){
+    setSyncStatus('error','Error: '+e.message);
+    // Fallback localStorage
+    try{ const sv=localStorage.getItem('ept_cbti_v1'); if(sv){ const d=JSON.parse(sv); STATUSES=d.statuses||STATUSES; OBS=d.obs||OBS; } }catch(e2){}
+  }
+  for(let i=0;i<TOTAL;i++){
+    renderStatus(i);
+    const ta=document.getElementById('obs-'+i);
+    if(ta) ta.value=OBS[i]||'';
+  }
+  updateStats();
+}
+
+// ── CYCLE ────────────────────────────────────────────────
+async function cycleStatus(i){
+  const cur=S_IDX[STATUSES[i]]||0;
+  STATUSES[i]=S_NEXT[cur];
+  renderStatus(i); updateStats();
+  setSyncStatus('saving','Guardando…');
+  try{
+    await apiPost({action:'ept_saveStatus', indicador_idx:i, estatus:STATUSES[i], usuario:'—'});
+    setSyncStatus('ok','Guardado ✓');
+    showToast('Indicador actualizado ✓');
+    // Cache local
+    try{localStorage.setItem('ept_cbti_v1',JSON.stringify({statuses:STATUSES,obs:OBS}));}catch(e){}
+  } catch(e){ setSyncStatus('error',e.message); showToast('⚠ Error al guardar'); }
+}
+
+function renderStatus(i){
+  const btn=document.getElementById('sbtn-'+i);
+  if(!btn) return;
+  const idx=S_IDX[STATUSES[i]]||0;
+  btn.className='status-btn '+S_CLS[idx];
+  btn.textContent=STATUSES[i];
+}
+
+let obsTimers={};
+function autoSaveObs(i){
+  clearTimeout(obsTimers[i]);
+  obsTimers[i]=setTimeout(async()=>{
+    const ta=document.getElementById('obs-'+i);
+    if(!ta) return;
+    OBS[i]=ta.value;
+    try{localStorage.setItem('ept_cbti_v1',JSON.stringify({statuses:STATUSES,obs:OBS}));}catch(e){}
+    setSyncStatus('saving','Guardando nota…');
+    try{
+      await apiPost({action:'ept_saveObs', indicador_idx:i, observaciones:OBS[i], usuario:'—'});
+      setSyncStatus('ok','Guardado ✓');
+      const sp=document.getElementById('obs-saved-'+i);
+      if(sp){ sp.style.opacity='1'; clearTimeout(sp._t); sp._t=setTimeout(()=>sp.style.opacity='0',1800); }
+    } catch(e){ setSyncStatus('error',e.message); }
+  },800);
+}
+
+function updateStats(){
+  document.getElementById('st-pend').textContent=STATUSES.filter(s=>s==='Pendiente').length;
+  document.getElementById('st-proc').textContent=STATUSES.filter(s=>s==='En proceso').length;
+  document.getElementById('st-comp').textContent=STATUSES.filter(s=>s==='Completado ✓').length;
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2000);
+}
+
+// ── INIT ────────────────────────────────────────────────
+loadFromSheets();
+</script>
+</body>
+</html>
