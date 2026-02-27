@@ -566,6 +566,7 @@ function buildSlotHtml(pid, idx, slot){
         <div class="ev-photo-overlay">
           <button onclick="viewPhoto('${pid}',${idx},${slot})">🔍 Ver en Drive</button>
           <button onclick="replacePhoto(${slot})">🔄 Cambiar foto</button>
+          <button onclick="deletePhoto('${pid}',${idx},${slot})">🗑 Borrar foto</button>
         </div>
         <div class="ev-photo-meta">${photo.fileName}<br>${photo.uploadedAt}</div>
         <input type="file" accept="image/jpeg,image/png,image/jpg,image/webp" id="ev-input-${slot}" onchange="selectPhoto(${slot},event)" style="display:none">
@@ -614,6 +615,30 @@ function viewPhoto(pid,idx,slot){
   const ev=(EVIDENCES[pid]||{})[idx];
   const photo=ev?(ev.photos||[])[slot]:null;
   if(photo&&photo.driveUrl) window.open(photo.driveUrl,'_blank');
+}
+
+async function deletePhoto(pid,idx,slot){
+  if(!confirm('¿Eliminar esta foto? Se borrará de Drive.')) return;
+  setSyncStatus('saving','Eliminando foto…');
+  try{
+    const result=await apiPost({
+      action:'sup_driveDelete',
+      programa:pid,
+      actividad_idx:idx,
+      slot:slot
+    });
+    if(result.error) throw new Error(result.error);
+    if(EVIDENCES[pid]&&EVIDENCES[pid][idx])
+      EVIDENCES[pid][idx].photos[slot]=null;
+    setSyncStatus('ok','Foto eliminada ✓');
+    showToast('Foto '+(slot+1)+' eliminada');
+    refreshModalBody();
+    const prog=PROGS.find(p=>p.id===pid);
+    if(prog&&STATE[pid]&&STATE[pid].open) renderPanel(prog);
+  }catch(e){
+    setSyncStatus('error','Error: '+e.message);
+    showToast('⚠ Error al borrar: '+e.message);
+  }
 }
 
 async function selectPhoto(slot,event){
