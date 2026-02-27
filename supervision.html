@@ -95,19 +95,19 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .acc-body{padding:16px 24px 24px;}
 
 /* ACTIVITIES */
-.act-item{display:grid;grid-template-columns:32px 1fr auto;align-items:start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.act-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
 .act-item:last-child{border-bottom:none;}
-.act-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
-.act-text{font-size:13px;line-height:1.6;color:var(--text);padding-top:5px;}
+.act-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;margin-top:2px;}
+.act-text{font-size:13px;line-height:1.6;color:var(--text);flex:1;}
 .act-text strong{font-weight:600;}
-.act-actions{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+.act-actions{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;min-width:130px;}
 
 /* STATUS BUTTON */
 .status-btn{
-  flex-shrink:0;border-radius:20px;padding:6px 14px;
+  width:100%;border-radius:20px;padding:6px 14px;
   font-size:10px;font-weight:700;letter-spacing:.05em;
   border:1px solid;cursor:pointer;font-family:'Outfit',sans-serif;
-  transition:all .15s;white-space:nowrap;outline:none;
+  transition:all .15s;white-space:nowrap;outline:none;text-align:center;
 }
 .s-p{background:#EDEBE4;color:var(--muted);border-color:var(--border);}
 .s-p:hover{background:#E3E0D9;}
@@ -118,16 +118,16 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 
 /* EVIDENCE BUTTON */
 .ev-btn{
-  flex-shrink:0;border-radius:8px;padding:5px 11px;
-  font-size:10px;font-weight:600;letter-spacing:.04em;
-  border:1px solid;cursor:pointer;font-family:'Outfit',sans-serif;
+  width:100%;border-radius:8px;padding:6px 10px;
+  font-size:10px;font-weight:700;letter-spacing:.04em;
+  border:1.5px dashed var(--border);cursor:pointer;font-family:'Outfit',sans-serif;
   transition:all .15s;white-space:nowrap;outline:none;
-  display:flex;align-items:center;gap:4px;
-  background:#F5F2EC;color:var(--muted);border-color:var(--border);
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  background:#fff;color:var(--muted);
 }
-.ev-btn:hover{background:#EAE7E0;}
-.ev-btn.has-ev{background:#E8F5E9;color:#166534;border-color:#86EFAC;}
-.ev-btn.has-ev:hover{background:#D1FAE5;}
+.ev-btn:hover{border-color:var(--guinda);color:var(--guinda);background:#FAF0F5;}
+.ev-btn.has-ev{background:#E8F5E9;color:#166534;border:1.5px solid #86EFAC;}
+.ev-btn.has-ev:hover{background:#D1FAE5;border-color:#4ade80;}
 
 /* EVIDENCE MODAL */
 .ev-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;}
@@ -520,19 +520,29 @@ async function saveObs(pid){
   }
 }
 
-// ══ EVIDENCIAS ══════════════════════════════════════════════════
-// Almacenamiento en localStorage (los archivos pueden ser grandes)
+// ══ EVIDENCIAS — almacenamiento en Google Sheets ════════════════
 // Estructura: { [pid]: { [idx]: { name, data, uploadedAt } } }
 let EVIDENCES = {};
 let _evState = { pid:null, idx:null, fileData:null, fileName:null };
 
-function loadEvidences(){
-  try { EVIDENCES = JSON.parse(localStorage.getItem('sup_ev_v1')||'{}'); } catch(e){ EVIDENCES={}; }
-}
-
-function persistEvidences(){
-  try { localStorage.setItem('sup_ev_v1', JSON.stringify(EVIDENCES)); }
-  catch(e){ showToast('⚠ Sin espacio para guardar evidencia (localStorage lleno)'); }
+// Carga evidencias desde Google Sheets
+async function loadEvidencesFromSheets(){
+  try{
+    const data = await apiGet({action:'sup_getEvidence'});
+    if(data.error) throw new Error(data.error);
+    (data.rows||[]).forEach(r=>{
+      if(!EVIDENCES[r.programa]) EVIDENCES[r.programa]={};
+      EVIDENCES[r.programa][r.actividad_idx]={
+        name: r.fileName,
+        data: r.fileData,
+        uploadedAt: r.uploadedAt
+      };
+    });
+    // Re-renderizar panel abierto si hay evidencias nuevas
+    PROGS.forEach(p=>{ if(STATE[p.id].open) renderPanel(p); });
+  }catch(e){
+    // Fallo silencioso — la evidencia se intentará cargar de nuevo al abrir cada modal
+  }
 }
 
 function openEvModal(pid, idx){
@@ -540,8 +550,7 @@ function openEvModal(pid, idx){
   const ev = (EVIDENCES[pid]||{})[idx];
   const prog = PROGS.find(p=>p.id===pid);
   const actName = prog ? prog.acts[idx] : '';
-  // Subtitle con nombre de actividad (truncado)
-  const sub = actName.replace(/<[^>]+>/g,'').slice(0,90) + (actName.length>90?'…':'');
+  const sub = actName.replace(/<[^>]+>/g,'').slice(0,100)+(actName.length>100?'…':'');
 
   let currentHtml = '';
   if(ev){
@@ -564,7 +573,6 @@ function openEvModal(pid, idx){
       <div class="ev-zone-name" id="evFileName"></div>
     </div>`;
 
-  // Drag & Drop
   const zone = document.getElementById('evZone');
   zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.classList.add('drag'); });
   zone.addEventListener('dragleave', ()=>zone.classList.remove('drag'));
@@ -593,26 +601,48 @@ function processEvFile(file){
   reader.readAsDataURL(file);
 }
 
-function saveCurrentEvidence(){
+async function saveCurrentEvidence(){
   const { pid, idx, fileData, fileName } = _evState;
   if(!fileData || pid===null || idx===null) return;
-  if(!EVIDENCES[pid]) EVIDENCES[pid] = {};
-  EVIDENCES[pid][idx] = {
+
+  const saveBtn = document.getElementById('evSaveBtn');
+  if(saveBtn){ saveBtn.disabled=true; saveBtn.textContent='Guardando…'; }
+
+  const evData = {
     name: fileName,
     data: fileData,
     uploadedAt: new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'})
   };
-  persistEvidences();
+
+  // Actualizar estado local (UI optimista)
+  if(!EVIDENCES[pid]) EVIDENCES[pid]={};
+  EVIDENCES[pid][idx] = evData;
   closeEvModal();
-  // Re-render panel para actualizar estado del botón
   const prog = PROGS.find(p=>p.id===pid);
   if(prog && STATE[pid].open) renderPanel(prog);
-  showToast('Evidencia guardada correctamente');
+
+  // Guardar en Google Sheets
+  setSyncStatus('saving','Guardando evidencia…');
+  try{
+    await apiPost({
+      action:'sup_saveEvidence',
+      programa: pid,
+      actividad_idx: idx,
+      fileName: evData.name,
+      fileData: evData.data,
+      uploadedAt: evData.uploadedAt
+    });
+    setSyncStatus('ok','Evidencia guardada en Sheets ✓');
+    showToast('Evidencia guardada en Sheets');
+  }catch(e){
+    setSyncStatus('error','Error al guardar evidencia');
+    showToast('⚠ No se pudo guardar en Sheets — el Apps Script necesita el handler sup_saveEvidence');
+  }
 }
 
 function downloadEvidence(pid, idx){
   const ev = (EVIDENCES[pid]||{})[idx];
-  if(!ev){ showToast('⚠ No hay evidencia para descargar'); return; }
+  if(!ev){ showToast('⚠ No hay evidencia disponible'); return; }
   const a = document.createElement('a');
   a.href = ev.data;
   a.download = ev.name;
@@ -630,8 +660,7 @@ function evOverlayClick(e){
 // ════════════════════════════════════════════════════════════════
 
 // ── INIT ──
-function init(){
-  loadEvidences();
+async function init(){
   const btnsEl=document.getElementById('progButtons');
   const panelsEl=document.getElementById('panels');
   PROGS.forEach(p=>{
@@ -645,7 +674,8 @@ function init(){
     div.id='panel-'+p.id;
     panelsEl.appendChild(div);
   });
-  loadFromSheets();
+  await loadFromSheets();
+  loadEvidencesFromSheets(); // carga evidencias en paralelo (no bloquea UI)
 }
 
 init();
