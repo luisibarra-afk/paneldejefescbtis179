@@ -100,13 +100,14 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .act-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;}
 .act-text{font-size:13px;line-height:1.6;color:var(--text);padding-top:5px;}
 .act-text strong{font-weight:600;}
+.act-actions{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
 
 /* STATUS BUTTON */
 .status-btn{
   flex-shrink:0;border-radius:20px;padding:6px 14px;
   font-size:10px;font-weight:700;letter-spacing:.05em;
   border:1px solid;cursor:pointer;font-family:'Outfit',sans-serif;
-  transition:all .15s;white-space:nowrap;margin-top:5px;outline:none;
+  transition:all .15s;white-space:nowrap;outline:none;
 }
 .s-p{background:#EDEBE4;color:var(--muted);border-color:var(--border);}
 .s-p:hover{background:#E3E0D9;}
@@ -114,6 +115,48 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .s-e:hover{background:#FEF08A;}
 .s-c{background:var(--green-l);color:var(--green);border-color:#86EFAC;}
 .s-c:hover{background:#BBF7D0;}
+
+/* EVIDENCE BUTTON */
+.ev-btn{
+  flex-shrink:0;border-radius:8px;padding:5px 11px;
+  font-size:10px;font-weight:600;letter-spacing:.04em;
+  border:1px solid;cursor:pointer;font-family:'Outfit',sans-serif;
+  transition:all .15s;white-space:nowrap;outline:none;
+  display:flex;align-items:center;gap:4px;
+  background:#F5F2EC;color:var(--muted);border-color:var(--border);
+}
+.ev-btn:hover{background:#EAE7E0;}
+.ev-btn.has-ev{background:#E8F5E9;color:#166534;border-color:#86EFAC;}
+.ev-btn.has-ev:hover{background:#D1FAE5;}
+
+/* EVIDENCE MODAL */
+.ev-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;}
+.ev-overlay.hidden{display:none;}
+.ev-modal{background:#fff;border-radius:16px;width:100%;max-width:500px;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden;}
+.ev-modal-hdr{background:var(--guinda);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;}
+.ev-modal-hdr h3{color:#fff;font-family:'Playfair Display',serif;font-size:16px;}
+.ev-modal-close{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ev-modal-close:hover{background:rgba(255,255,255,.25);}
+.ev-modal-body{padding:20px;}
+.ev-subtitle{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:14px;padding:8px 12px;background:var(--bg);border-radius:8px;border-left:3px solid var(--guinda);}
+.ev-current{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.ev-current-info{flex:1;min-width:0;}
+.ev-current-name{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);}
+.ev-current-meta{font-size:10px;color:var(--muted);margin-top:2px;}
+.ev-dl-btn{background:var(--guinda);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.ev-dl-btn:hover{opacity:.85;}
+.ev-zone{border:2px dashed var(--border);border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .15s;position:relative;background:var(--bg);}
+.ev-zone:hover,.ev-zone.drag{border-color:var(--guinda);background:#FAF0F5;}
+.ev-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.ev-zone-ico{font-size:32px;margin-bottom:8px;}
+.ev-zone-txt{font-size:12px;color:var(--muted);line-height:1.5;}
+.ev-zone-name{margin-top:10px;font-size:12px;font-weight:700;color:var(--guinda);}
+.ev-modal-ftr{padding:14px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;background:var(--surface);}
+.ev-cancel-btn{background:var(--bg);color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:9px 20px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
+.ev-cancel-btn:hover{background:#EAE7E0;}
+.ev-save-btn{background:var(--guinda);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;}
+.ev-save-btn:hover{opacity:.85;}
+.ev-save-btn:disabled{opacity:.4;cursor:not-allowed;}
 
 /* OBSERVATIONS */
 .obs-wrap{margin-top:20px;border-top:1px solid var(--border);padding-top:16px;}
@@ -207,6 +250,21 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 </footer>
 
 <div class="toast" id="toast"></div>
+
+<!-- MODAL DE EVIDENCIA -->
+<div class="ev-overlay hidden" id="evOverlay" onclick="evOverlayClick(event)">
+  <div class="ev-modal" id="evModal">
+    <div class="ev-modal-hdr">
+      <h3>📎 Evidencia de subtarea</h3>
+      <button class="ev-modal-close" onclick="closeEvModal()">✕</button>
+    </div>
+    <div class="ev-modal-body" id="evModalBody"></div>
+    <div class="ev-modal-ftr">
+      <button class="ev-cancel-btn" onclick="closeEvModal()">Cancelar</button>
+      <button class="ev-save-btn" id="evSaveBtn" onclick="saveCurrentEvidence()" disabled>💾 Guardar evidencia</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ══ CONFIGURACIÓN — pega tu URL de Apps Script aquí ══════════
@@ -365,10 +423,16 @@ function renderPanel(p){
   const nums=p.id==='escuela'?['A','B','C','D','E']:p.acts.map((_,i)=>i+1);
   const acts=p.acts.map((a,i)=>{
     const s=st.statuses[i];
+    const ev=(EVIDENCES[p.id]||{})[i];
+    const evBtnCls=ev?'ev-btn has-ev':'ev-btn';
+    const evBtnLbl=ev?'📥 Ver evidencia':'📎 Agregar evidencia';
     return `<div class="act-item">
       <div class="act-num" style="background:${p.color}">${nums[i]}</div>
       <div class="act-text">${a}</div>
-      <button class="status-btn ${S_CLS[s]}" onclick="cycleStatus('${p.id}',${i})">${S_LBL[s]}</button>
+      <div class="act-actions">
+        <button class="status-btn ${S_CLS[s]}" onclick="cycleStatus('${p.id}',${i})">${S_LBL[s]}</button>
+        <button class="${evBtnCls}" onclick="openEvModal('${p.id}',${i})">${evBtnLbl}</button>
+      </div>
     </div>`;
   }).join('');
   const alertHtml=p.alert?`<div class="acc-alert" style="background:${p.light};border:1px solid ${p.color}40;color:${p.color}">${p.alert}</div>`:'';
@@ -456,8 +520,118 @@ async function saveObs(pid){
   }
 }
 
+// ══ EVIDENCIAS ══════════════════════════════════════════════════
+// Almacenamiento en localStorage (los archivos pueden ser grandes)
+// Estructura: { [pid]: { [idx]: { name, data, uploadedAt } } }
+let EVIDENCES = {};
+let _evState = { pid:null, idx:null, fileData:null, fileName:null };
+
+function loadEvidences(){
+  try { EVIDENCES = JSON.parse(localStorage.getItem('sup_ev_v1')||'{}'); } catch(e){ EVIDENCES={}; }
+}
+
+function persistEvidences(){
+  try { localStorage.setItem('sup_ev_v1', JSON.stringify(EVIDENCES)); }
+  catch(e){ showToast('⚠ Sin espacio para guardar evidencia (localStorage lleno)'); }
+}
+
+function openEvModal(pid, idx){
+  _evState = { pid, idx, fileData:null, fileName:null };
+  const ev = (EVIDENCES[pid]||{})[idx];
+  const prog = PROGS.find(p=>p.id===pid);
+  const actName = prog ? prog.acts[idx] : '';
+  // Subtitle con nombre de actividad (truncado)
+  const sub = actName.replace(/<[^>]+>/g,'').slice(0,90) + (actName.length>90?'…':'');
+
+  let currentHtml = '';
+  if(ev){
+    currentHtml = `<div class="ev-current">
+      <div class="ev-current-info">
+        <div class="ev-current-name">📄 ${ev.name}</div>
+        <div class="ev-current-meta">Cargado: ${ev.uploadedAt}</div>
+      </div>
+      <button class="ev-dl-btn" onclick="downloadEvidence('${pid}',${idx})">⬇ Descargar</button>
+    </div>`;
+  }
+
+  document.getElementById('evModalBody').innerHTML = `
+    <div class="ev-subtitle">${sub}</div>
+    ${currentHtml}
+    <div class="ev-zone" id="evZone">
+      <input type="file" id="evFileIn" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" onchange="evFileSelected(event)">
+      <div class="ev-zone-ico">📎</div>
+      <div class="ev-zone-txt">${ev?'Reemplazar evidencia — haz clic o arrastra':'Selecciona o arrastra un archivo aquí'}<br><small>PDF · PNG · JPG · DOC · DOCX &nbsp;|&nbsp; máx. 5 MB</small></div>
+      <div class="ev-zone-name" id="evFileName"></div>
+    </div>`;
+
+  // Drag & Drop
+  const zone = document.getElementById('evZone');
+  zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', ()=>zone.classList.remove('drag'));
+  zone.addEventListener('drop', e=>{ e.preventDefault(); zone.classList.remove('drag'); const f=e.dataTransfer.files[0]; if(f) processEvFile(f); });
+
+  document.getElementById('evSaveBtn').disabled = true;
+  document.getElementById('evOverlay').classList.remove('hidden');
+}
+
+function evFileSelected(e){
+  const f = e.target.files[0];
+  if(f) processEvFile(f);
+}
+
+function processEvFile(file){
+  if(file.size > 5*1024*1024){ showToast('⚠ El archivo supera los 5 MB'); return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    _evState.fileData = ev.target.result;
+    _evState.fileName = file.name;
+    const nm = document.getElementById('evFileName');
+    if(nm) nm.textContent = '✓ ' + file.name;
+    const btn = document.getElementById('evSaveBtn');
+    if(btn) btn.disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveCurrentEvidence(){
+  const { pid, idx, fileData, fileName } = _evState;
+  if(!fileData || pid===null || idx===null) return;
+  if(!EVIDENCES[pid]) EVIDENCES[pid] = {};
+  EVIDENCES[pid][idx] = {
+    name: fileName,
+    data: fileData,
+    uploadedAt: new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'})
+  };
+  persistEvidences();
+  closeEvModal();
+  // Re-render panel para actualizar estado del botón
+  const prog = PROGS.find(p=>p.id===pid);
+  if(prog && STATE[pid].open) renderPanel(prog);
+  showToast('Evidencia guardada correctamente');
+}
+
+function downloadEvidence(pid, idx){
+  const ev = (EVIDENCES[pid]||{})[idx];
+  if(!ev){ showToast('⚠ No hay evidencia para descargar'); return; }
+  const a = document.createElement('a');
+  a.href = ev.data;
+  a.download = ev.name;
+  a.click();
+}
+
+function closeEvModal(){
+  document.getElementById('evOverlay').classList.add('hidden');
+  _evState = { pid:null, idx:null, fileData:null, fileName:null };
+}
+
+function evOverlayClick(e){
+  if(e.target.id==='evOverlay') closeEvModal();
+}
+// ════════════════════════════════════════════════════════════════
+
 // ── INIT ──
 function init(){
+  loadEvidences();
   const btnsEl=document.getElementById('progButtons');
   const panelsEl=document.getElementById('panels');
   PROGS.forEach(p=>{
