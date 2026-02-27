@@ -31,6 +31,7 @@ function doPost(e) {
     if      (action === 'sup_saveStatus')  result = sup_saveStatus(body);
     else if (action === 'sup_saveObs')     result = sup_saveObs(body);
     else if (action === 'sup_driveUpload') result = sup_driveUpload(body);
+    else if (action === 'sup_driveDelete') result = sup_driveDelete(body);
     else result = { error: 'Acción POST desconocida: ' + action };
   } catch(err) {
     result = { error: err.toString() };
@@ -168,6 +169,26 @@ function sup_driveUpload(p) {
   ]);
 
   return { ok: true, fileId, fileUrl };
+}
+
+// ─────────────────────────────────────────────────
+//  sup_driveDelete  — borra foto de Drive y Sheets
+// ─────────────────────────────────────────────────
+function sup_driveDelete(p) {
+  const evSheet = getSheet('supervision_evidence');
+  const eData   = evSheet.getDataRange().getValues();
+  for (let i = 1; i < eData.length; i++) {
+    if (
+      eData[i][0] === p.programa &&
+      String(eData[i][1]) === String(p.actividad_idx) &&
+      String(eData[i][2]) === String(p.slot)
+    ) {
+      try { DriveApp.getFileById(eData[i][3]).setTrashed(true); } catch(e) {}
+      evSheet.deleteRow(i + 1);
+      return { ok: true };
+    }
+  }
+  return { ok: true };
 }
 
 // ─────────────────────────────────────────────────
