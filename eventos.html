@@ -618,6 +618,7 @@ function buildSlotHtml(eventoId, slot){
         <div class="photo-empty" style="display:none"><div class="photo-empty-ico">📷</div><div class="photo-empty-txt">Vista previa<br>no disponible</div></div>
         <div class="photo-overlay-btns">
           <button onclick="viewPhotoEv('${eventoId}',${slot})">🔍 Ver en Drive</button>
+          <button onclick="downloadPhotoEv('${eventoId}',${slot})">⬇️ Descargar</button>
           <button onclick="replacePhotoEv(${slot})">🔄 Cambiar foto</button>
           <button onclick="deletePhotoEv('${eventoId}',${slot})">🗑 Borrar foto</button>
         </div>
@@ -645,6 +646,15 @@ function replacePhotoEv(slot){
 function viewPhotoEv(eventoId,slot){
   const ph=(EV_PHOTOS[eventoId]||{photos:[null,null]}).photos[slot];
   if(ph&&ph.driveUrl) window.open(ph.driveUrl,'_blank');
+}
+function downloadPhotoEv(eventoId,slot){
+  const ph=(EV_PHOTOS[eventoId]||{photos:[null,null]}).photos[slot];
+  if(!ph||!ph.fileId) return;
+  const a=document.createElement('a');
+  a.href='https://drive.google.com/uc?export=download&id='+ph.fileId;
+  a.download=ph.fileName||('foto-'+(slot+1)+'.jpg');
+  a.target='_blank';
+  a.click();
 }
 async function deletePhotoEv(eventoId,slot){
   if(!confirm('¿Eliminar esta foto? Se borrará de Drive.')) return;
