@@ -13,6 +13,8 @@ function doGet(e) {
   try {
     if      (action === 'sup_getAll')      result = sup_getAll();
     else if (action === 'sup_getEvidence') result = sup_getEvidence();
+    else if (action === 'ev_getAll')       result = ev_getAll();
+    else if (action === 'ev_getPhotos')    result = ev_getPhotos();
     else result = { error: 'Acción GET desconocida: ' + action };
   } catch(err) {
     result = { error: err.toString() };
@@ -32,6 +34,10 @@ function doPost(e) {
     else if (action === 'sup_saveObs')     result = sup_saveObs(body);
     else if (action === 'sup_driveUpload') result = sup_driveUpload(body);
     else if (action === 'sup_driveDelete') result = sup_driveDelete(body);
+    else if (action === 'ev_save')         result = ev_save(body);
+    else if (action === 'ev_delete')       result = ev_delete(body);
+    else if (action === 'ev_driveUpload')  result = ev_driveUpload(body);
+    else if (action === 'ev_driveDelete')  result = ev_driveDelete(body);
     else result = { error: 'Acción POST desconocida: ' + action };
   } catch(err) {
     result = { error: err.toString() };
@@ -192,6 +198,138 @@ function sup_driveDelete(p) {
 }
 
 // ─────────────────────────────────────────────────
+//  ev_getAll  — lee todos los eventos
+// ─────────────────────────────────────────────────
+function ev_getAll() {
+  const sheet = getSheet('eventos');
+  const data  = sheet.getDataRange().getValues();
+  const rows  = [];
+  for (let i = 1; i < data.length; i++) {
+    rows.push({
+      id:          data[i][0],
+      tipo:        data[i][1],
+      nombre:      data[i][2],
+      fecha:       data[i][3],
+      presentes:   data[i][4],
+      actividades: data[i][5],
+      autoridades: data[i][6],
+      notas:       data[i][7],
+      createdAt:   data[i][8]
+    });
+  }
+  return { rows };
+}
+
+// ─────────────────────────────────────────────────
+//  ev_getPhotos  — lee metadatos de fotos de eventos
+// ─────────────────────────────────────────────────
+function ev_getPhotos() {
+  const sheet = getSheet('eventos_evidence');
+  const data  = sheet.getDataRange().getValues();
+  const rows  = [];
+  for (let i = 1; i < data.length; i++) {
+    rows.push({
+      evento_id:  data[i][0],
+      slot:       data[i][1],
+      fileId:     data[i][2],
+      fileUrl:    data[i][3],
+      fileName:   data[i][4],
+      uploadedAt: data[i][5]
+    });
+  }
+  return { rows };
+}
+
+// ─────────────────────────────────────────────────
+//  ev_save  — crea o actualiza un evento
+// ─────────────────────────────────────────────────
+function ev_save(p) {
+  const ev    = p.evento;
+  const sheet = getSheet('eventos');
+  const data  = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === ev.id) {
+      sheet.getRange(i + 1, 1, 1, 9).setValues([[
+        ev.id, ev.tipo, ev.nombre, ev.fecha,
+        ev.presentes, ev.actividades, ev.autoridades, ev.notas,
+        data[i][8]
+      ]]);
+      return { ok: true };
+    }
+  }
+  const now = Utilities.formatDate(new Date(), 'America/Mexico_City', 'dd/MMM/yyyy HH:mm');
+  sheet.appendRow([ev.id, ev.tipo, ev.nombre, ev.fecha, ev.presentes, ev.actividades, ev.autoridades, ev.notas, now]);
+  return { ok: true };
+}
+
+// ─────────────────────────────────────────────────
+//  ev_delete  — elimina evento y sus fotos
+// ─────────────────────────────────────────────────
+function ev_delete(p) {
+  const sheet = getSheet('eventos');
+  const data  = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === p.id) { sheet.deleteRow(i + 1); break; }
+  }
+  const evSheet = getSheet('eventos_evidence');
+  const eData   = evSheet.getDataRange().getValues();
+  for (let i = eData.length - 1; i >= 1; i--) {
+    if (eData[i][0] === p.id) {
+      try { DriveApp.getFileById(eData[i][2]).setTrashed(true); } catch(e) {}
+      evSheet.deleteRow(i + 1);
+    }
+  }
+  return { ok: true };
+}
+
+// ─────────────────────────────────────────────────
+//  ev_driveUpload  — sube foto de evento a Drive
+// ─────────────────────────────────────────────────
+function ev_driveUpload(p) {
+  const base64 = p.fileData.split(',')[1];
+  const blob   = Utilities.newBlob(Utilities.base64Decode(base64), p.mimeType, p.fileName);
+
+  const rootFolder = getOrCreateFolder(DriveApp.getRootFolder(), DRIVE_ROOT);
+  const evFolder   = getOrCreateFolder(rootFolder, 'eventos');
+  const tipoFolder = getOrCreateFolder(evFolder,   p.tipo   || 'Otro');
+  const nombFolder = getOrCreateFolder(tipoFolder, p.nombre || p.evento_id);
+
+  const evSheet = getSheet('eventos_evidence');
+  const eData   = evSheet.getDataRange().getValues();
+  for (let i = 1; i < eData.length; i++) {
+    if (eData[i][0] === p.evento_id && String(eData[i][1]) === String(p.slot)) {
+      try { DriveApp.getFileById(eData[i][2]).setTrashed(true); } catch(e) {}
+      evSheet.deleteRow(i + 1);
+      break;
+    }
+  }
+
+  const file = nombFolder.createFile(blob);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  const fileId  = file.getId();
+  const fileUrl = 'https://drive.google.com/file/d/' + fileId + '/view';
+  const now     = Utilities.formatDate(new Date(), 'America/Mexico_City', 'dd/MMM/yyyy');
+  evSheet.appendRow([p.evento_id, p.slot, fileId, fileUrl, p.fileName, now]);
+  return { ok: true, fileId, fileUrl };
+}
+
+// ─────────────────────────────────────────────────
+//  ev_driveDelete  — borra foto de evento de Drive
+// ─────────────────────────────────────────────────
+function ev_driveDelete(p) {
+  const evSheet = getSheet('eventos_evidence');
+  const eData   = evSheet.getDataRange().getValues();
+  for (let i = 1; i < eData.length; i++) {
+    if (eData[i][0] === p.evento_id && String(eData[i][1]) === String(p.slot)) {
+      try { DriveApp.getFileById(eData[i][2]).setTrashed(true); } catch(e) {}
+      evSheet.deleteRow(i + 1);
+      return { ok: true };
+    }
+  }
+  return { ok: true };
+}
+
+// ─────────────────────────────────────────────────
 //  Helpers
 // ─────────────────────────────────────────────────
 function getSheet(name) {
@@ -203,6 +341,10 @@ function getSheet(name) {
       sheet.appendRow(['programa', 'actividad_idx', 'estatus', 'observaciones']);
     } else if (name === 'supervision_evidence') {
       sheet.appendRow(['programa', 'actividad_idx', 'slot', 'fileId', 'fileUrl', 'fileName', 'uploadedAt']);
+    } else if (name === 'eventos') {
+      sheet.appendRow(['id','tipo','nombre','fecha','presentes','actividades','autoridades','notas','createdAt']);
+    } else if (name === 'eventos_evidence') {
+      sheet.appendRow(['evento_id','slot','fileId','fileUrl','fileName','uploadedAt']);
     }
   }
   return sheet;
